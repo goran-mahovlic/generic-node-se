@@ -116,7 +116,7 @@ typedef void ( *SecureElementNvmEvent )( void );
 SecureElementStatus_t SecureElementInit( SecureElementNvmEvent seNvmCtxChanged );
 
 /*!
- * Remove previously generated derived keys with "label" from memory 
+ * Remove previously generated derived keys with "label" from memory
  *
  * \param[IN]     kms_key_label       - string of char to be searched in the key label
  * \retval                            - Status of the operation
@@ -200,7 +200,7 @@ SecureElementStatus_t SecureElementAesEncrypt( uint8_t* buffer, uint16_t size, K
  * \param[IN]  targetKeyID    - Key identifier of the key which will be derived
  * \retval                    - Status of the operation
  */
-SecureElementStatus_t SecureElementDeriveAndStoreKey( Version_t version, uint8_t* input, KeyIdentifier_t rootKeyID, KeyIdentifier_t targetKeyID );
+SecureElementStatus_t SecureElementDeriveAndStoreKey( uint8_t* input, KeyIdentifier_t rootKeyID, KeyIdentifier_t targetKeyID );
 
 /*!
  * Process JoinAccept message.

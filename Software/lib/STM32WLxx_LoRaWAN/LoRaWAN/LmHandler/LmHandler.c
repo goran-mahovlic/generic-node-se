@@ -1,7 +1,7 @@
 /*!
  * \file      LmHandler.c
  *
- * \brief     Implements the LoRaMac layer handling. 
+ * \brief     Implements the LoRaMac layer handling.
  *            Provides the possibility to register applicative packages.
  *
  * \remark    Inspired by the examples provided on the en.i-cube_lrwan fork.
@@ -40,7 +40,7 @@
 #include "mw_log_conf.h"  /* needed for MW_LOG */
 #include "lora_mac_version.h"
 #include "Commissioning.h"
-#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0)) 
+#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0))
 #else
 #include "kms.h"
 #include "kms_platf_objects_interface.h"
@@ -50,7 +50,7 @@
 #include "LmHandlerInfo.h"
 #include "LmhpCompliance.h"
 #include "LoRaMacTest.h"
-#if (!defined (LORAWAN_DATA_DISTRIB_MGT) || (LORAWAN_DATA_DISTRIB_MGT == 0)) 
+#if (!defined (LORAWAN_DATA_DISTRIB_MGT) || (LORAWAN_DATA_DISTRIB_MGT == 0))
 #else /*LORAWAN_DATA_DISTRIB_MGT == 1*/
 #include "LmhpDataDistribution.h"
 #endif /*LORAWAN_DATA_DISTRIB_MGT*/
@@ -71,14 +71,14 @@ typedef struct CommissioningParams_s
 {
     uint8_t DevEui[8];
     uint8_t JoinEui[8];
-#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0)) 
+#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0))
     uint8_t GenAppKey[16];
     uint8_t AppKey[16];
     uint8_t NwkKey[16];
 #endif
     uint32_t NetworkId;
     uint32_t DevAddr;
-#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0)) 
+#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0))
     uint8_t FNwkSIntKey[16];
     uint8_t SNwkSIntKey[16];
     uint8_t NwkSEncKey[16];
@@ -211,18 +211,18 @@ static void DisplayBeaconUpdate( LoRaMAcHandlerBeaconParams_t* params );
 #endif
 
 /* Private variables ---------------------------------------------------------*/
-static CommissioningParams_t CommissioningParams = 
+static CommissioningParams_t CommissioningParams =
 {
   .DevEui = LORAWAN_DEVICE_EUI,
   .JoinEui = LORAWAN_JOIN_EUI,
-#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0)) 
+#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0))
   .GenAppKey = FORMAT_KEY(LORAWAN_GEN_APP_KEY),
   .AppKey = FORMAT_KEY(LORAWAN_APP_KEY),
   .NwkKey = FORMAT_KEY(LORAWAN_NWK_KEY),
 #endif
   .NetworkId = LORAWAN_NETWORK_ID,
   .DevAddr = LORAWAN_DEVICE_ADDRESS,
-#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0)) 
+#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0))
   .FNwkSIntKey = FORMAT_KEY(LORAWAN_F_NWK_S_INT_KEY),
   .SNwkSIntKey = FORMAT_KEY(LORAWAN_S_NWK_S_INT_KEY),
   .NwkSEncKey = FORMAT_KEY(LORAWAN_NWK_S_ENC_KEY),
@@ -337,10 +337,10 @@ static bool CtxRestoreDone = false;
 LmHandlerErrorStatus_t LmHandlerInit( LmHandlerCallbacks_t *handlerCallbacks )
 {
   LmHandlerInfo_Init();
-  
+
   UTIL_MEM_cpy_8((void *)&LmHandlerCallbacks, (const void *)handlerCallbacks, sizeof(LmHandlerCallbacks_t));
-  
-  MW_LOG(TS_OFF, VLEVEL_M, "MAC_VERSION= V%X.%X.%X_rc%X\r\n", (uint8_t)(__LORA_MAC_VERSION >> __LORA_MAC_MAIN_SHIFT), (uint8_t)(__LORA_MAC_VERSION >> __LORA_MAC_SUB1_SHIFT), (uint8_t)(__LORA_MAC_VERSION >> __LORA_MAC_SUB2_SHIFT),  (uint8_t)(__LORA_MAC_VERSION >> __LORA_MAC_VERSION_RC));
+
+  // MW_LOG(TS_OFF, VLEVEL_M, "MAC_VERSION= V%X.%X.%X_rc%X\r\n", (uint8_t)(__LORA_MAC_VERSION >> __LORA_MAC_MAIN_SHIFT), (uint8_t)(__LORA_MAC_VERSION >> __LORA_MAC_SUB1_SHIFT), (uint8_t)(__LORA_MAC_VERSION >> __LORA_MAC_SUB2_SHIFT),  (uint8_t)(__LORA_MAC_VERSION >> __LORA_MAC_VERSION_RC));
 
   LoRaMacPrimitives.MacMcpsConfirm = McpsConfirm;
   LoRaMacPrimitives.MacMcpsIndication = McpsIndication;
@@ -350,7 +350,7 @@ LmHandlerErrorStatus_t LmHandlerInit( LmHandlerCallbacks_t *handlerCallbacks )
   LoRaMacCallbacks.GetTemperatureLevel = LmHandlerCallbacks.GetTemperature;
   LoRaMacCallbacks.NvmContextChange = NvmCtxMgmtEvent;
   LoRaMacCallbacks.MacProcessNotify = LmHandlerCallbacks.OnMacProcess;
-  
+
   /*The LoRa-Alliance Compliance protocol package should always be initialized and activated.*/
   if ( LmHandlerPackageRegister( PACKAGE_ID_COMPLIANCE, &LmhpComplianceParams ) != LORAMAC_HANDLER_SUCCESS )
   {
@@ -373,12 +373,12 @@ LmHandlerErrorStatus_t LmHandlerConfigure( LmHandlerParams_t *handlerParams )
 
   UTIL_MEM_cpy_8((void *)&LmHandlerParams, (const void *)handlerParams, sizeof(LmHandlerParams_t));
 
-#if ( LORAMAC_CLASSB_ENABLED == 1 ) 
+#if ( LORAMAC_CLASSB_ENABLED == 1 )
   IsClassBSwitchPending = false;
 #endif
-  
+
   lmHandlerInfo = LmHandlerInfo_GetPtr();
-  
+
   if( 0U != ((1<<(LmHandlerParams.ActiveRegion)) & (lmHandlerInfo->Region)) )
   {
     if( LoRaMacInitialization( &LoRaMacPrimitives, &LoRaMacCallbacks, LmHandlerParams.ActiveRegion ) != LORAMAC_STATUS_OK )
@@ -391,7 +391,7 @@ LmHandlerErrorStatus_t LmHandlerConfigure( LmHandlerParams_t *handlerParams )
     MW_LOG(TS_ON, VLEVEL_ALWAYS,"error: Region is not defined in the MW: set lorawan_conf.h accordingly\r\n");
     while(1) {}   /* error: Region is not defined in the MW */
   }
-  
+
   // Try to restore from NVM and query the mac if possible.
   if( NvmCtxMgmtRestore( ) == NVMCTXMGMT_STATUS_SUCCESS )
   {
@@ -400,23 +400,23 @@ LmHandlerErrorStatus_t LmHandlerConfigure( LmHandlerParams_t *handlerParams )
   else
   {
     CtxRestoreDone = false;
-    
+
 #if ( STATIC_DEVICE_EUI != 1 )
     LmHandlerCallbacks.GetUniqueId(CommissioningParams.DevEui);
 #endif
 
-#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0)) 
-    mibReq.Type = MIB_APP_KEY;
-    mibReq.Param.AppKey = CommissioningParams.AppKey;
-    LoRaMacMibSetRequestConfirm( &mibReq );
-    
-    mibReq.Type = MIB_NWK_KEY;
-    mibReq.Param.NwkKey = CommissioningParams.NwkKey;
-    LoRaMacMibSetRequestConfirm( &mibReq );
-    
-    mibReq.Type = MIB_GEN_APP_KEY;
-    mibReq.Param.GenAppKey = CommissioningParams.GenAppKey;
-    LoRaMacMibSetRequestConfirm( &mibReq );
+#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0))
+    // mibReq.Type = MIB_APP_KEY;
+    // mibReq.Param.AppKey = CommissioningParams.AppKey;
+    // LoRaMacMibSetRequestConfirm( &mibReq );
+
+    // mibReq.Type = MIB_NWK_KEY;
+    // mibReq.Param.NwkKey = CommissioningParams.NwkKey;
+    // LoRaMacMibSetRequestConfirm( &mibReq );
+
+    // mibReq.Type = MIB_GEN_APP_KEY;
+    // mibReq.Param.GenAppKey = CommissioningParams.GenAppKey;
+    // LoRaMacMibSetRequestConfirm( &mibReq );
 #else /* LORAWAN_KMS == 1 */
     SecureElementSetObjHandler(APP_KEY, KMS_APP_KEY_OBJECT_HANDLE);
     SecureElementSetObjHandler(NWK_KEY, KMS_NWK_KEY_OBJECT_HANDLE);
@@ -424,20 +424,20 @@ LmHandlerErrorStatus_t LmHandlerConfigure( LmHandlerParams_t *handlerParams )
 #if ( LORAMAC_CLASSB_ENABLED == 1 )
     SecureElementSetObjHandler(SLOT_RAND_ZERO_KEY, KMS_ZERO_KEY_OBJECT_HANDLE);
 #endif /* LORAMAC_CLASSB_ENABLED */
-#endif   
-    mibReq.Type = MIB_DEV_EUI;
-    mibReq.Param.DevEui = CommissioningParams.DevEui;
-    LoRaMacMibSetRequestConfirm( &mibReq );
+#endif
+    // mibReq.Type = MIB_DEV_EUI;
+    // mibReq.Param.DevEui = CommissioningParams.DevEui;
+    // LoRaMacMibSetRequestConfirm( &mibReq );
 
-    mibReq.Type = MIB_JOIN_EUI;
-    mibReq.Param.JoinEui = CommissioningParams.JoinEui;
-    LoRaMacMibSetRequestConfirm( &mibReq );
+    // mibReq.Type = MIB_JOIN_EUI;
+    // mibReq.Param.JoinEui = CommissioningParams.JoinEui;
+    // LoRaMacMibSetRequestConfirm( &mibReq );
   }
-  MW_LOG(TS_OFF, VLEVEL_M, "###### DevEui:    %02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X\r\n", HEX8(CommissioningParams.DevEui));
-  MW_LOG(TS_OFF, VLEVEL_M, "###### AppEui:    %02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X\r\n", HEX8(CommissioningParams.JoinEui));
-#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0)) 
-  MW_LOG(TS_OFF, VLEVEL_M, "###### AppKey:    %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\r\n", HEX16(CommissioningParams.NwkKey));
-  MW_LOG(TS_OFF, VLEVEL_M, "###### GenAppKey: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\r\n", HEX16(CommissioningParams.GenAppKey));
+  // MW_LOG(TS_OFF, VLEVEL_M, "###### DevEui:    %02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X\r\n", HEX8(SecureElementGetDevEui();));
+  // MW_LOG(TS_OFF, VLEVEL_M, "###### AppEui:    %02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X\r\n", HEX8(CommissioningParams.JoinEui));
+#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0))
+  // MW_LOG(TS_OFF, VLEVEL_M, "###### AppKey:    %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\r\n", HEX16(CommissioningParams.NwkKey));
+  // MW_LOG(TS_OFF, VLEVEL_M, "###### GenAppKey: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\r\n", HEX16(CommissioningParams.GenAppKey));
 #else
   MW_LOG(TS_OFF, VLEVEL_L, "###### KMS ENABLED \r\n");
 #endif
@@ -449,7 +449,7 @@ LmHandlerErrorStatus_t LmHandlerConfigure( LmHandlerParams_t *handlerParams )
   mibReq.Type = MIB_ADR;
   mibReq.Param.AdrEnable = LmHandlerParams.AdrEnable;
   LoRaMacMibSetRequestConfirm( &mibReq );
-  
+
   mibReq.Type = MIB_SYSTEM_MAX_RX_ERROR;
   mibReq.Param.SystemMaxRxError = 20;
   LoRaMacMibSetRequestConfirm( &mibReq );
@@ -459,10 +459,10 @@ LmHandlerErrorStatus_t LmHandlerConfigure( LmHandlerParams_t *handlerParams )
   getPhy.Attribute = PHY_DUTY_CYCLE;
   phyParam = RegionGetPhyParam( LmHandlerParams.ActiveRegion, &getPhy );
   LmHandlerParams.DutyCycleEnabled = ( bool ) phyParam.Value;
-  
+
   // override previous value if reconfigure new region
   LoRaMacTestSetDutyCycleOn(LmHandlerParams.DutyCycleEnabled);
-  
+
   return LORAMAC_HANDLER_SUCCESS;
 }
 
@@ -476,8 +476,8 @@ LmHandlerErrorStatus_t LmHandlerConfigure( LmHandlerParams_t *handlerParams )
 void LmHandlerJoin( ActivationType_t mode )
 {
   MibRequestConfirm_t mibReq;
-  
-#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0)) 
+
+#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0))
 #else /* LORAWAN_KMS == 1 */
 #if (OVER_THE_AIR_ACTIVATION == 0)
   if( mode == ACTIVATION_TYPE_OTAA )
@@ -494,7 +494,7 @@ void LmHandlerJoin( ActivationType_t mode )
   }
 #endif /* ACTIVATION_BY_PERSONALISATION */
 #endif /* LORAWAN_KMS */
-  SecureElementDeleteDerivedKeys(NULL);
+  // SecureElementDeleteDerivedKeys(NULL);
 
   if( mode == ACTIVATION_TYPE_OTAA )
   {
@@ -502,7 +502,7 @@ void LmHandlerJoin( ActivationType_t mode )
     JoinParams.Mode = ACTIVATION_TYPE_OTAA;
 
     LoRaMacStart( );
-    
+
     mlmeReq.Type = MLME_JOIN;
     mlmeReq.Req.Join.Datarate = LmHandlerParams.TxDatarate;
     LoRaMacMlmeRequest( &mlmeReq );
@@ -526,13 +526,13 @@ void LmHandlerJoin( ActivationType_t mode )
       mibReq.Type = MIB_NET_ID;
       mibReq.Param.NetID = CommissioningParams.NetworkId;
       LoRaMacMibSetRequestConfirm( &mibReq );
-      
+
       mibReq.Type = MIB_DEV_ADDR;
       mibReq.Param.DevAddr = CommissioningParams.DevAddr;
       LoRaMacMibSetRequestConfirm( &mibReq );
       MW_LOG(TS_OFF, VLEVEL_M, "###### DevAddr:   %08X\r\n", CommissioningParams.DevAddr);
-          
-#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0)) 
+
+#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0))
       mibReq.Type = MIB_F_NWK_S_INT_KEY;
       mibReq.Param.FNwkSIntKey = CommissioningParams.FNwkSIntKey;
       LoRaMacMibSetRequestConfirm( &mibReq );
@@ -542,11 +542,11 @@ void LmHandlerJoin( ActivationType_t mode )
       mibReq.Type = MIB_S_NWK_S_INT_KEY;
       mibReq.Param.SNwkSIntKey = CommissioningParams.SNwkSIntKey;
       LoRaMacMibSetRequestConfirm( &mibReq );
-      
+
       mibReq.Type = MIB_NWK_S_ENC_KEY;
       mibReq.Param.NwkSEncKey = CommissioningParams.NwkSEncKey;
       LoRaMacMibSetRequestConfirm( &mibReq );
-      
+
       mibReq.Type = MIB_APP_S_KEY;
       mibReq.Param.AppSKey = CommissioningParams.AppSKey;
       LoRaMacMibSetRequestConfirm( &mibReq );
@@ -559,12 +559,12 @@ void LmHandlerJoin( ActivationType_t mode )
     SecureElementSetObjHandler(APP_S_KEY, KMS_APP_S_KEY_OBJECT_HANDLE);
 #endif  /* LORAWAN_KMS */
     }
-    
+
     LoRaMacStart( );
     mibReq.Type = MIB_NETWORK_ACTIVATION;
     mibReq.Param.NetworkActivation = ACTIVATION_TYPE_ABP;
     LoRaMacMibSetRequestConfirm( &mibReq );
-    
+
     LmHandlerCallbacks.OnJoinRequest( &JoinParams );
     LmHandlerRequestClass( LmHandlerParams.DefaultClass );
   }
@@ -586,14 +586,14 @@ bool LmHandlerIsBusy( void )
   {
     return true;
   }
-  
+
   if( LmHandlerJoinStatus( ) != LORAMAC_HANDLER_SET )
   {
     // The network isn't yet joined, try again later.
     LmHandlerJoin( JoinParams.Mode );
     return true;
   }
-  
+
   if( LmHandlerPackages[PACKAGE_ID_COMPLIANCE]->IsRunning( ) == true )
   {
     return true;
@@ -606,12 +606,12 @@ LmHandlerErrorStatus_t LmHandlerSend( LmHandlerAppData_t *appData, LmHandlerMsgT
   LoRaMacStatus_t status;
   McpsReq_t mcpsReq;
   LoRaMacTxInfo_t txInfo;
-  
+
   if( LoRaMacIsBusy( ) == true )
   {
     return LORAMAC_HANDLER_ERROR;
   }
-  
+
   if( LmHandlerJoinStatus( ) != LORAMAC_HANDLER_SET )
   {
     // The network isn't yet joined, try again later.
@@ -623,7 +623,7 @@ LmHandlerErrorStatus_t LmHandlerSend( LmHandlerAppData_t *appData, LmHandlerMsgT
   {
     return LORAMAC_HANDLER_ERROR;
   }
-  
+
   mcpsReq.Req.Unconfirmed.Datarate = LmHandlerParams.TxDatarate;
   if( LoRaMacQueryTxPossible( appData->BufferSize, &txInfo ) != LORAMAC_STATUS_OK )
   {
@@ -649,16 +649,16 @@ LmHandlerErrorStatus_t LmHandlerSend( LmHandlerAppData_t *appData, LmHandlerMsgT
       mcpsReq.Req.Confirmed.NbTrials = 8;
     }
   }
-  
+
   TxParams.AppData = *appData;
   TxParams.Datarate = LmHandlerParams.TxDatarate;
-  
+
   if (nextTxIn != NULL)
   {
     LoRaMacQueryNextTxDelay( TxParams.Datarate, nextTxIn );
   }
   status = LoRaMacMcpsRequest( &mcpsReq, allowDelayedTx );
-  
+
   if( status == LORAMAC_STATUS_OK )
   {
     return LORAMAC_HANDLER_SUCCESS;
@@ -674,19 +674,19 @@ LmHandlerErrorStatus_t LmHandlerRequestClass( DeviceClass_t newClass )
   MibRequestConfirm_t mibReq;
   DeviceClass_t currentClass;
   LmHandlerErrorStatus_t errorStatus = LORAMAC_HANDLER_SUCCESS;
-  
+
   if( LmHandlerJoinStatus( ) != LORAMAC_HANDLER_SET )
   {
     return LORAMAC_HANDLER_NO_NETWORK_JOINED;
   }
-    
+
   mibReq.Type = MIB_DEVICE_CLASS;
   if( LoRaMacMibGetRequestConfirm( &mibReq ) != LORAMAC_STATUS_OK )
   {
     return LORAMAC_HANDLER_ERROR;
   }
   currentClass = mibReq.Param.Class;
-  
+
   // Attempt to switch only if class update
   if( currentClass != newClass )
   {
@@ -780,7 +780,7 @@ LmHandlerErrorStatus_t LmHandlerPackageRegister( uint8_t id, void *params )
     LmHandlerPackages[id]->OnSendRequest = LmHandlerSend;
     LmHandlerPackages[id]->OnDeviceTimeRequest = LmHandlerDeviceTimeReq;
     LmHandlerPackages[id]->Init( params, AppData.Buffer, LORAWAN_APP_DATA_BUFFER_MAX_SIZE );
-    
+
     return LORAMAC_HANDLER_SUCCESS;
   }
   else
@@ -803,7 +803,7 @@ void LmHandlerPackagesProcess( void )
       LmHandlerPackages[i]->Process( );
     }
   }
-  
+
   NvmCtxMgmtStore( );
 }
 
@@ -820,7 +820,7 @@ int32_t LmHandlerGetCurrentClass( DeviceClass_t *deviceClass )
   {
     return LORAMAC_HANDLER_ERROR;
   }
-  
+
   *deviceClass = mibReq.Param.Class;
   return LORAMAC_HANDLER_SUCCESS;
 }
@@ -851,7 +851,7 @@ int32_t LmHandlerSetDevEUI( uint8_t *devEUI )
     return LORAMAC_HANDLER_ERROR;
   }
 #else
- return LORAMAC_HANDLER_ERROR; 
+ return LORAMAC_HANDLER_ERROR;
 #endif
 }
 
@@ -863,7 +863,7 @@ int32_t LmHandlerGetAppEUI( uint8_t *appEUI )
   }
 
   UTIL_MEM_cpy_8( appEUI, CommissioningParams.JoinEui, 8 );
- 
+
   return LORAMAC_HANDLER_SUCCESS;
 }
 
@@ -889,8 +889,8 @@ int32_t LmHandlerGetAppKey( uint8_t *appKey )
     return LORAMAC_HANDLER_ERROR;
   }
 
-#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0)) 
-  UTIL_MEM_cpy_8( appKey, CommissioningParams.NwkKey, 16 );  
+#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0))
+  UTIL_MEM_cpy_8( appKey, CommissioningParams.NwkKey, 16 );
   return LORAMAC_HANDLER_SUCCESS;
 #else /* LORAWAN_KMS == 1 */
  /*can only be done if the key attribute is EXTRACTABLE */
@@ -901,7 +901,7 @@ int32_t LmHandlerGetAppKey( uint8_t *appKey )
 
 int32_t LmHandlerSetAppKey( uint8_t *appKey )
 {
-#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0)) 
+#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0))
   // Not yet joined
   if( LmHandlerJoinStatus( ) != LORAMAC_HANDLER_SET )
   {
@@ -975,7 +975,7 @@ int32_t LmHandlerSetDevAddr( uint32_t devAddr )
 
 int32_t LmHandlerSetNwkSKey( uint8_t* nwkSKey )
 {
-#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0)) 
+#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0))
   // Not yet joined
   if( LmHandlerJoinStatus( ) != LORAMAC_HANDLER_SET )
   {
@@ -988,7 +988,7 @@ int32_t LmHandlerSetNwkSKey( uint8_t* nwkSKey )
     return LORAMAC_HANDLER_ERROR;
   }
 #else /* LORAWAN_KMS == 1 */
-#if defined (ACTIVATION_BY_PERSONALISATION) && (ACTIVATION_BY_PERSONALISATION == 1) 
+#if defined (ACTIVATION_BY_PERSONALISATION) && (ACTIVATION_BY_PERSONALISATION == 1)
   /* this feature is currently not supported by KMS */
   /* Ticket 80993: The function CreateObject will be used when available on Kms */
   /* It will create an key in NVM and remap the init table on that handler */
@@ -999,7 +999,7 @@ int32_t LmHandlerSetNwkSKey( uint8_t* nwkSKey )
 
 int32_t LmHandlerSetAppSKey( uint8_t* appSKey )
 {
-#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0)) 
+#if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0))
   // Not yet joined
   if( LmHandlerJoinStatus( ) != LORAMAC_HANDLER_SET )
   {
@@ -1012,7 +1012,7 @@ int32_t LmHandlerSetAppSKey( uint8_t* appSKey )
     return LORAMAC_HANDLER_ERROR;
   }
 #else /* LORAWAN_KMS == 1 */
-#if defined (ACTIVATION_BY_PERSONALISATION) && (ACTIVATION_BY_PERSONALISATION == 1) 
+#if defined (ACTIVATION_BY_PERSONALISATION) && (ACTIVATION_BY_PERSONALISATION == 1)
   /* this feature is currently not supported by KMS */
   /* Ticket 80993: The function CreateObject will be used when available on Kms */
   /* It will create an key in NVM and remap the init table on that handler */
@@ -1099,7 +1099,7 @@ int32_t LmHandlerSetTxDatarate( int8_t txDatarate )
   }
 
   LmHandlerParams.TxDatarate = txDatarate;
-  
+
   return LORAMAC_HANDLER_SUCCESS;
 }
 
@@ -1128,15 +1128,15 @@ int32_t LmHandlerGetRX2Params( RxChannelParams_t *rxParams )
   {
     return LORAMAC_HANDLER_ERROR;
   }
-  
+
   MibRequestConfirm_t mibReq;
-  
+
   mibReq.Type = MIB_RX2_CHANNEL;
   if( LoRaMacMibGetRequestConfirm( &mibReq ) != LORAMAC_STATUS_OK )
   {
     return LORAMAC_HANDLER_ERROR;
   }
-  
+
   rxParams->Frequency = mibReq.Param.Rx2Channel.Frequency;
   rxParams->Datarate = mibReq.Param.Rx2Channel.Datarate;
   return LORAMAC_HANDLER_SUCCESS;
@@ -1149,7 +1149,7 @@ int32_t LmHandlerGetTxPower( int8_t *txPower )
   {
     return LORAMAC_HANDLER_ERROR;
   }
-  
+
   mibReq.Type = MIB_CHANNELS_TX_POWER;
   if( LoRaMacMibGetRequestConfirm( &mibReq ) != LORAMAC_STATUS_OK )
   {
@@ -1167,7 +1167,7 @@ int32_t LmHandlerGetRx1Delay( uint32_t *rxDelay )
   {
     return LORAMAC_HANDLER_ERROR;
   }
-  
+
   mibReq.Type = MIB_RECEIVE_DELAY_1;
   if( LoRaMacMibGetRequestConfirm( &mibReq ) != LORAMAC_STATUS_OK )
   {
@@ -1185,7 +1185,7 @@ int32_t LmHandlerGetRx2Delay( uint32_t *rxDelay )
   {
     return LORAMAC_HANDLER_ERROR;
   }
-  
+
   mibReq.Type = MIB_RECEIVE_DELAY_2;
   if( LoRaMacMibGetRequestConfirm( &mibReq ) != LORAMAC_STATUS_OK )
   {
@@ -1203,7 +1203,7 @@ int32_t LmHandlerGetJoinRx1Delay( uint32_t *rxDelay )
   {
     return LORAMAC_HANDLER_ERROR;
   }
-  
+
   mibReq.Type = MIB_JOIN_ACCEPT_DELAY_1;
   if( LoRaMacMibGetRequestConfirm( &mibReq ) != LORAMAC_STATUS_OK )
   {
@@ -1221,7 +1221,7 @@ int32_t LmHandlerGetJoinRx2Delay( uint32_t *rxDelay )
   {
     return LORAMAC_HANDLER_ERROR;
   }
-  
+
   mibReq.Type = MIB_JOIN_ACCEPT_DELAY_2;
   if( LoRaMacMibGetRequestConfirm( &mibReq ) != LORAMAC_STATUS_OK )
   {
@@ -1249,7 +1249,7 @@ int32_t LmHandlerSetTxPower(int8_t txPower)
 int32_t LmHandlerSetRX2Params( RxChannelParams_t *rxParams)
 {
   MibRequestConfirm_t mibReq;
-  
+
   mibReq.Type = MIB_RX2_CHANNEL;
   mibReq.Param.Rx2Channel.Frequency = rxParams->Frequency;
   mibReq.Param.Rx2Channel.Datarate = rxParams->Datarate;
@@ -1352,12 +1352,12 @@ int32_t LmHandlerGetBeaconState( BeaconState_t *beaconState )
 #if ( LORAMAC_CLASSB_ENABLED == 1 )
   MibRequestConfirm_t mibReq;
   LoRaMacClassBNvmCtx_t* CtxClassB;
-  
+
   if (beaconState == NULL)
   {
     return LORAMAC_HANDLER_ERROR;
   }
-  
+
   mibReq.Type = MIB_NVM_CTXS;
   if( LoRaMacMibGetRequestConfirm( &mibReq ) != LORAMAC_STATUS_OK )
   {
@@ -1368,7 +1368,7 @@ int32_t LmHandlerGetBeaconState( BeaconState_t *beaconState )
   {
     return LORAMAC_HANDLER_ERROR;
   }
-  
+
   *beaconState =  CtxClassB->BeaconCtx.BeaconState;
   return LORAMAC_HANDLER_SUCCESS;
 #else
@@ -1381,10 +1381,10 @@ static LmHandlerFlagStatus_t LmHandlerJoinStatus( void )
 {
   MibRequestConfirm_t mibReq;
   LoRaMacStatus_t status;
-  
+
   mibReq.Type = MIB_NETWORK_ACTIVATION;
   status = LoRaMacMibGetRequestConfirm( &mibReq );
-  
+
   if( status == LORAMAC_STATUS_OK )
   {
     if( mibReq.Param.NetworkActivation == ACTIVATION_TYPE_NONE )
@@ -1406,9 +1406,9 @@ static LmHandlerErrorStatus_t LmHandlerDeviceTimeReq( void )
 {
   LoRaMacStatus_t status;
   MlmeReq_t mlmeReq;
-  
+
   mlmeReq.Type = MLME_DEVICE_TIME;
-  
+
   TimerTime_t nextTxIn = 0;
   LoRaMacQueryNextTxDelay( TxParams.Datarate, &nextTxIn );
   status = LoRaMacMlmeRequest( &mlmeReq );
@@ -1434,7 +1434,7 @@ static LmHandlerErrorStatus_t LmHandlerBeaconReq( void )
   TimerTime_t nextTxIn = 0;
   LoRaMacQueryNextTxDelay( TxParams.Datarate, &nextTxIn );
   status = LoRaMacMlmeRequest( &mlmeReq );
-  
+
   if( status == LORAMAC_STATUS_OK )
   {
     return LORAMAC_HANDLER_SUCCESS;
@@ -1449,15 +1449,15 @@ static LmHandlerErrorStatus_t LmHandlerPingSlotReq( uint8_t periodicity )
 {
   LoRaMacStatus_t status;
   MlmeReq_t mlmeReq;
-  
+
   mlmeReq.Type = MLME_PING_SLOT_INFO;
   mlmeReq.Req.PingSlotInfo.PingSlot.Fields.Periodicity = periodicity;
   mlmeReq.Req.PingSlotInfo.PingSlot.Fields.RFU = 0;
-  
+
   TimerTime_t nextTxIn = 0;
   LoRaMacQueryNextTxDelay( TxParams.Datarate, &nextTxIn );
   status = LoRaMacMlmeRequest( &mlmeReq );
-  
+
   if( status == LORAMAC_STATUS_OK )
   {
     LmHandlerParams.PingPeriodicity = periodicity;
@@ -1486,9 +1486,9 @@ static void McpsConfirm( McpsConfirm_t *mcpsConfirm )
   TxParams.TxPower = mcpsConfirm->TxPower;
   TxParams.Channel = mcpsConfirm->Channel;
   TxParams.AckReceived = mcpsConfirm->AckReceived;
-  
+
   LmHandlerCallbacks.OnTxData( &TxParams );
-  
+
   LmHandlerPackagesNotify( PACKAGE_MCPS_CONFIRM, mcpsConfirm );
 }
 
@@ -1498,12 +1498,12 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
   DeviceClass_t deviceClass;
   RxParams.IsMcpsIndication = 1;
   RxParams.Status = mcpsIndication->Status;
-  
+
   if( RxParams.Status != LORAMAC_EVENT_INFO_STATUS_OK )
   {
     return;
   }
-  
+
   if (mcpsIndication->BufferSize > 0)
   {
     RxParams.Datarate = mcpsIndication->RxDatarate;
@@ -1511,7 +1511,7 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
     RxParams.Snr = mcpsIndication->Snr;
     RxParams.DownlinkCounter = mcpsIndication->DownLinkCounter;
     RxParams.RxSlot = mcpsIndication->RxSlot;
-    
+
     appData.Port = mcpsIndication->Port;
     appData.BufferSize = mcpsIndication->BufferSize;
     appData.Buffer = mcpsIndication->Buffer;
@@ -1526,7 +1526,7 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
   {
     // The server signals that it has pending data to be sent.
     // We schedule an uplink as soon as possible to flush the server.
-    
+
     // Send an empty message
     LmHandlerAppData_t appData =
     {
@@ -1542,9 +1542,9 @@ static void MlmeConfirm( MlmeConfirm_t *mlmeConfirm )
 {
   TxParams.IsMcpsConfirm = 0;
   TxParams.Status = mlmeConfirm->Status;
-  
+
   LmHandlerPackagesNotify( PACKAGE_MLME_CONFIRM, mlmeConfirm );
-  
+
   switch( mlmeConfirm->MlmeRequest )
   {
   case MLME_JOIN:
@@ -1554,7 +1554,7 @@ static void MlmeConfirm( MlmeConfirm_t *mlmeConfirm )
       LoRaMacMibGetRequestConfirm( &mibReq );
       CommissioningParams.DevAddr = mibReq.Param.DevAddr;
       LmHandlerGetTxDatarate(&JoinParams.Datarate);
-      
+
       if( mlmeConfirm->Status == LORAMAC_EVENT_INFO_STATUS_OK )
       {
         // Status is OK, node has joined the network
@@ -1609,12 +1609,12 @@ static void MlmeConfirm( MlmeConfirm_t *mlmeConfirm )
       if( mlmeConfirm->Status == LORAMAC_EVENT_INFO_STATUS_OK )
       {
         MibRequestConfirm_t mibReq;
-        
+
         // Class B is now activated
         mibReq.Type = MIB_DEVICE_CLASS;
         mibReq.Param.Class = CLASS_B;
         LoRaMacMibSetRequestConfirm( &mibReq );
-        
+
         DisplayClassUpdate(CLASS_B);
 
         IsClassBSwitchPending = false;
@@ -1635,7 +1635,7 @@ static void MlmeIndication( MlmeIndication_t *mlmeIndication )
 {
   RxParams.IsMcpsIndication = 0;
   RxParams.Status = mlmeIndication->Status;
-  
+
   switch( mlmeIndication->MlmeIndication )
   {
 #if ( LORAMAC_CLASSB_ENABLED == 1 )
@@ -1646,15 +1646,15 @@ static void MlmeIndication( MlmeIndication_t *mlmeIndication )
       mibReq.Type = MIB_DEVICE_CLASS;
       mibReq.Param.Class = CLASS_A;
       LoRaMacMibSetRequestConfirm( &mibReq );
-      
+
       BeaconParams.State = LORAMAC_HANDLER_BEACON_LOST;
       BeaconParams.Info.Time.Seconds = 0;
       BeaconParams.Info.GwSpecific.InfoDesc = 0;
       UTIL_MEM_set_8( BeaconParams.Info.GwSpecific.Info, 0, 6 );
-      
+
       DisplayClassUpdate(CLASS_A);
       DisplayBeaconUpdate( &BeaconParams );
-      
+
       LmHandlerDeviceTimeReq( );
     }
     break;
@@ -1664,14 +1664,14 @@ static void MlmeIndication( MlmeIndication_t *mlmeIndication )
       {
         BeaconParams.State = LORAMAC_HANDLER_BEACON_RX;
         BeaconParams.Info = mlmeIndication->BeaconInfo;
-        
+
         DisplayBeaconUpdate( &BeaconParams );
       }
       else
       {
         BeaconParams.State = LORAMAC_HANDLER_BEACON_NRX;
         BeaconParams.Info = mlmeIndication->BeaconInfo;
-        
+
         DisplayBeaconUpdate( &BeaconParams );
       }
       break;
