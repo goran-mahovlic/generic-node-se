@@ -188,8 +188,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if (GPIO_Pin == BUTTON_SW1)
   {
-    /* Note: when "EventType == TX_ON_TIMER" this GPIO is not initialised */
-    UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_LoRaSendOnTxTimerOrButtonEvent), CFG_SEQ_Prio_0);
+    /* Note: This pin is not initialised */
   }
   if (GPIO_Pin == ACC_INT_PIN)
   {
