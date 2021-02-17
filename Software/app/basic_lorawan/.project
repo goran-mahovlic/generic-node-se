@@ -43,6 +43,11 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
+			<name>lib/AS7341</name>
+			<type>2</type>
+			<locationURI>PARENT-2-PROJECT_LOC/lib/AS7341</locationURI>
+		</link>
+		<link>
 			<name>lib/BUZZER</name>
 			<type>2</type>
 			<locationURI>PARENT-2-PROJECT_LOC/lib/BUZZER</locationURI>
