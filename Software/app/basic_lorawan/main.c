@@ -25,9 +25,24 @@
 #include "stm32_seq.h"
 #include "sys_app.h"
 #include "lora_app.h"
+#include "app.h"
 
 static void SystemClock_Config(void);
 static void Error_Handler(void);
+
+void led_toggle(uint8_t n_toggles, uint32_t toggle_delay);
+void buzzer_play(uint8_t n_plays, uint32_t play_delay);
+//void secure_element_read_info(void);
+void tempreture_sensor_read_data_polling(uint8_t n_reads, uint32_t read_delay);
+void accelerometer_read_data_polling(uint8_t n_reads, uint32_t read_delay);
+void as7341_read_data_polling(uint8_t n_reads, uint32_t read_delay);
+void flash_read_write(void);
+void battery_report(void);
+
+void uart_rxcallback(uint8_t *rxChar, uint16_t size, uint8_t error)
+{
+  APP_PPRINTF("\r\n DEBUG_USART data received \r\n");
+}
 
 void MX_LoRaWAN_Init(void)
 {
@@ -44,6 +59,45 @@ int main(void)
 {
   HAL_Init();
   SystemClock_Config();
+  UTIL_ADV_TRACE_Init();
+  UTIL_ADV_TRACE_StartRxProcess(uart_rxcallback);
+  UTIL_ADV_TRACE_SetVerboseLevel(VLEVEL_H);
+
+  APP_PPRINTF("\r\n -------------- Starting GNSE basic app -------------- \r\n");
+
+  APP_PPRINTF("\r\n Testing battery monitoring functionality \r\n");
+  battery_report();
+
+  APP_PPRINTF("\r\n Testing LED functionality \r\n");
+  led_toggle(NUMBER_LED_TOGGLE, LED_TOGGLE_INTERVAL);
+
+  APP_PPRINTF("\r\n Testing secure element functionality \r\n");
+  APP_PPRINTF("\r\n 1) Enabling LOAD_SWITCH_SENSORS \r\n");
+  GNSE_BSP_LS_Init(LOAD_SWITCH_SENSORS);
+  GNSE_BSP_LS_On(LOAD_SWITCH_SENSORS);
+  HAL_Delay(100);
+  GNSE_BSP_Sensor_I2C1_Init();
+  HAL_Delay(100);
+  APP_PPRINTF("\r\n 2) Attempting to read secure element serial number \r\n");
+//  secure_element_read_info();
+
+  APP_PPRINTF("\r\n Testing on board sensors functionality \r\n");
+  APP_PPRINTF("\r\n Attempting to read sensors data \r\n");
+  tempreture_sensor_read_data_polling(NUMBER_TEMPRETURE_SENSOR_READ, TEMPRETURE_SENSOR_READ_INTERVAL);
+  accelerometer_read_data_polling(NUMBER_ACCLEROMETER_READ, ACCELEROMETER_READ_INTERVAL);
+  as7341_read_data_polling(NUMBER_as7341_READ, as7341_READ_INTERVAL);
+
+  APP_PPRINTF("\r\n Testing on board external flash functionality \r\n");
+  APP_PPRINTF("\r\n 1) Enabling LOAD_SWITCH_FLASH \r\n");
+  GNSE_BSP_LS_Init(LOAD_SWITCH_FLASH);
+  GNSE_BSP_LS_On(LOAD_SWITCH_FLASH);
+  HAL_Delay(100);
+
+  APP_PPRINTF("\r\n 2) Attempting to read & write to external flash \r\n");
+  flash_read_write();
+
+  APP_PPRINTF("\r\n Testing Buzzer functionality \r\n");
+  buzzer_play(NUMBER_BUZZER_PLAY, BUZZER_PLAY_INTERVAL);
   MX_LoRaWAN_Init();
   while (1)
   {

@@ -39,6 +39,7 @@
 #include "MX25R16.h"
 #include "LIS2DH12.h"
 #include "BUZZER.h"
+#include "AS7341.h"
 
 /**
  * Application helpers

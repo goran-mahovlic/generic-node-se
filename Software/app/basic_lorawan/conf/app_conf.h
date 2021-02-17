@@ -35,6 +35,21 @@
 /* LOW_POWER_DISABLE = 1 : LowPowerMode disabled : MCU enters sleep mode only */
 #define LOW_POWER_DISABLE 0
 
+#define NUMBER_LED_TOGGLE 20
+#define LED_TOGGLE_INTERVAL 100
+
+#define NUMBER_BUZZER_PLAY 2
+#define BUZZER_PLAY_INTERVAL 1000
+
+#define NUMBER_TEMPRETURE_SENSOR_READ 5
+#define TEMPRETURE_SENSOR_READ_INTERVAL 1000
+
+#define NUMBER_ACCLEROMETER_READ 5
+#define ACCELEROMETER_READ_INTERVAL 1000
+
+#define NUMBER_as7341_READ 5
+#define as7341_READ_INTERVAL 1000
+
 /**
   * Supported requester to the MCU Low Power Manager - can be increased up  to 32
   * It lists a bit mapping of all user of the Low Power Manager
