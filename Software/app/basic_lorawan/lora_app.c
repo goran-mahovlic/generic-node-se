@@ -109,6 +109,7 @@ static LmHandlerCallbacks_t LmHandlerCallbacks =
     {
         .GetBatteryLevel = GetBatteryLevel,
         .GetTemperature = GetTemperatureLevel,
+		.GetAS7341 = AS7341_read_ID,
         .GetUniqueId = GetUniqueId,
         .GetRandomSeed = GetRandomSeed,
         .OnJoinRequest = OnJoinRequest,
@@ -231,6 +232,8 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
 
 static void SendTxData(void)
 {
+  uint8_t as7341_ID = 0x00;
+  LmHandlerCallbacks.GetAS7341(&as7341_ID);
   UTIL_TIMER_Time_t nextTxIn = 0;
 
   UTIL_TIMER_Create(&TxLedTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTimerLedEvent, NULL);
@@ -242,7 +245,7 @@ static void SendTxData(void)
 
   AppData.Port = LORAWAN_APP_PORT;
   AppData.BufferSize = 3;
-  AppData.Buffer[0] = 0xAA;
+  AppData.Buffer[0] = as7341_ID;
   AppData.Buffer[1] = 0xBB;
   AppData.Buffer[2] = 0xCC;
 

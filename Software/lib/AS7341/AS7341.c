@@ -51,12 +51,9 @@
 
 static const uint16_t AS7341_CMD_DURATION_USEC = 1000;
 
-static const uint16_t AS7341_CMD_SLEEP = 0xB098;
-static const uint16_t AS7341_CMD_WAKEUP = 0x3517;
+//static const uint16_t AS7341_CMD_SLEEP = 0xB098;
+//static const uint16_t AS7341_CMD_WAKEUP = 0x3517;
 
-int8_t AS7341_read_ID(uint8_t *ID) {
-    int8_t ret;
-
-    HAL_I2C_Mem_Read(&GNSE_BSP_sensor_i2c1, SPECTR_ADDR, WHOAMI_ADRR, 1, ret, 1, AS7341_CMD_DURATION_USEC);
-    return ret;
+void AS7341_read_ID(uint8_t *id) {
+    HAL_I2C_Mem_Read(&GNSE_BSP_sensor_i2c1, SPECTR_ADDR, WHOAMI_ADRR, 1, id, 1, AS7341_CMD_DURATION_USEC);
 }

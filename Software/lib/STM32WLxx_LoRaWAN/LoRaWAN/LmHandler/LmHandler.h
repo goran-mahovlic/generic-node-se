@@ -123,6 +123,12 @@ typedef struct LmHandlerCallbacks_s
    */
   uint8_t ( *GetBatteryLevel )( void );
   /*!
+   * Get the current AS7341 readings
+   *
+   * \retval value  ID
+   */
+  void ( *GetAS7341 )( uint8_t *id );
+  /*!
    * Get the current temperature
    *
    * \retval value  Temperature in degree Celsius

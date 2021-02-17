@@ -116,6 +116,11 @@ uint16_t GetTemperatureLevel(void)
   return 20; // Dumy value to use in the basic app, user can add desired implementation depending on the board.
 }
 
+uint8_t GetAS7341readings(void)
+{
+  return 20; // Dumy value to use in the basic app, user can add desired implementation depending on the board.
+}
+
 uint32_t GetRandomSeed(void)
 {
   uint32_t val = 0;
