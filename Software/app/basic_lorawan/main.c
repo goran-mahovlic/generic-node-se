@@ -59,9 +59,12 @@ int main(void)
 {
   HAL_Init();
   SystemClock_Config();
-  UTIL_ADV_TRACE_Init();
-  UTIL_ADV_TRACE_StartRxProcess(uart_rxcallback);
-  UTIL_ADV_TRACE_SetVerboseLevel(VLEVEL_H);
+
+  // UTIL_ADV_TRACE_Init();
+  // UTIL_ADV_TRACE_StartRxProcess(uart_rxcallback);
+  // UTIL_ADV_TRACE_SetVerboseLevel(VLEVEL_H);
+
+  MX_LoRaWAN_Init();
 
   APP_PPRINTF("\r\n -------------- Starting GNSE basic app -------------- \r\n");
 
@@ -96,9 +99,10 @@ int main(void)
   APP_PPRINTF("\r\n 2) Attempting to read & write to external flash \r\n");
   flash_read_write();
 
-  APP_PPRINTF("\r\n Testing Buzzer functionality \r\n");
-  buzzer_play(NUMBER_BUZZER_PLAY, BUZZER_PLAY_INTERVAL);
-  MX_LoRaWAN_Init();
+//  APP_PPRINTF("\r\n Testing Buzzer functionality \r\n");
+//  buzzer_play(NUMBER_BUZZER_PLAY, BUZZER_PLAY_INTERVAL);
+  APP_PPRINTF("\r\n Starting LoRa \r\n");
+
   while (1)
   {
     MX_LoRaWAN_Process();
