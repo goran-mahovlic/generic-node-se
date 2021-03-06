@@ -161,7 +161,7 @@ void LoRaWAN_Init(void)
   {
     /* send every time timer elapses */
     UTIL_TIMER_Create(&TxTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTxTimerEvent, NULL);
-    UTIL_TIMER_SetPeriod(&TxTimer, APP_TX_DUTYCYCLE);
+    UTIL_TIMER_SetPeriod(&TxTimer, APP_TX_DUTYCYCLE * 6 * 5); // 10 seconds * 6 * 5 -- every 5 min
     UTIL_TIMER_Start(&TxTimer);
   }
   else
@@ -232,22 +232,22 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
 
 static void SendTxData(void)
 {
-  uint8_t as7341_ID = 0x00;
-  LmHandlerCallbacks.GetAS7341(&as7341_ID);
+  uint8_t reading[24];
+  LmHandlerCallbacks.GetAS7341(reading);
   UTIL_TIMER_Time_t nextTxIn = 0;
-
-  UTIL_TIMER_Create(&TxLedTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTimerLedEvent, NULL);
-  UTIL_TIMER_SetPeriod(&TxLedTimer, 200);
+  APP_PPRINTF("\r\n AS7341 ID: %x \r\n",reading);
+  //UTIL_TIMER_Create(&TxLedTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTimerLedEvent, NULL);
+  //UTIL_TIMER_SetPeriod(&TxLedTimer, 200);
 
   // User can add any indication here (LED manipulation or Buzzer)
 
-  UTIL_TIMER_Start(&TxLedTimer);
+  //UTIL_TIMER_Start(&TxLedTimer);
 
   AppData.Port = LORAWAN_APP_PORT;
-  AppData.BufferSize = 3;
-  AppData.Buffer[0] = as7341_ID;
-  AppData.Buffer[1] = 0xBB;
-  AppData.Buffer[2] = 0xCC;
+  AppData.BufferSize = 24;
+  for (int i=0;i<24;i++){
+	  AppData.Buffer[i] = reading[i];
+  }
 
   if (LORAMAC_HANDLER_SUCCESS == LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, &nextTxIn, false))
   {
