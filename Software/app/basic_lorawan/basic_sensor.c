@@ -37,9 +37,10 @@ typedef union
 void as7341_read_data_polling(uint8_t n_reads, uint32_t read_delay){
     //int16_t status = 0;
     //uint8_t read_counter = 0;
-    uint8_t sensorID = 0x00;
+	uint8_t readings[24];
+    //uint8_t sensorID = 0x00;
     sensirion_i2c_init();
-    AS7341_read_ID(&sensorID);
+    AS7341_read_ID(readings);
 }
 
 void tempreture_sensor_read_data_polling(uint8_t n_reads, uint32_t read_delay)
