@@ -35,7 +35,7 @@
 static void Gpio_PreInit(void);
 
 /**
-  * @brief  Initiliszes the system for debugging or low power mode debending on DEBUGGER_ON
+  * @brief  Initialises the system for debugging or low power mode depending on DEBUGGER_ON
   * @param none
   * @return None
   */
@@ -167,8 +167,6 @@ void GetUniqueId(uint8_t *id)
     id[0] = (val >> 16) & 0xFF;
   }
 }
-
-
 static void TimestampNow(uint8_t *buff, uint16_t *size)
 {
   SysTime_t curtime = SysTimeGet();

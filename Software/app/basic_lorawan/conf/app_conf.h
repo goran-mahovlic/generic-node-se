@@ -26,7 +26,7 @@
 
 #define APP_LOG_ENABLED 1
 
-/* if ON (=1) it enables the debbugger plus 4 dgb pins */
+/* if ON (=1) it enables the debugger plus 4 dgb pins */
 /* if OFF (=0) the debugger is OFF (lower consumption) */
 #define DEBUGGER_ON       0
 
@@ -81,7 +81,7 @@ typedef enum
   */
 typedef enum
 {
-  CFG_SEQ_Task_LmHandlerPackageProcess,
+  CFG_SEQ_Task_LmHandlerProcess,
   CFG_SEQ_Task_LoRaSendOnTxTimerOrButtonEvent,
   CFG_SEQ_Task_NBR
 } CFG_SEQ_Task_Id_t;
