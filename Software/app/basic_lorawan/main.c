@@ -60,9 +60,9 @@ int main(void)
   HAL_Init();
   SystemClock_Config();
 
-  // UTIL_ADV_TRACE_Init();
-  // UTIL_ADV_TRACE_StartRxProcess(uart_rxcallback);
-  // UTIL_ADV_TRACE_SetVerboseLevel(VLEVEL_H);
+  //UTIL_ADV_TRACE_Init();
+  //UTIL_ADV_TRACE_StartRxProcess(uart_rxcallback);
+  //UTIL_ADV_TRACE_SetVerboseLevel(VLEVEL_H);
 
   MX_LoRaWAN_Init();
 
@@ -103,7 +103,13 @@ int main(void)
 
 //  APP_PPRINTF("\r\n Testing Buzzer functionality \r\n");
 //  buzzer_play(NUMBER_BUZZER_PLAY, BUZZER_PLAY_INTERVAL);
-  APP_PPRINTF("\r\n Starting LoRa \r\n");
+
+  HAL_I2C_MspInit(&GNSE_BSP_ext_sensor_i2c2);
+  GNSE_BSP_Ext_Sensor_I2C2_Init();
+  uint8_t msg [24];
+  AS7341_read(msg);
+
+  //APP_PPRINTF("\r\n Starting LoRa \r\n");
 
   while (1)
   {

@@ -42,7 +42,7 @@ extern "C" {
  * @param serial    the address for the result of the serial number
  * @return          0 if the command was successful, else an error code.
  */
-void AS7341_read_ID(uint8_t *reading);
+void AS7341_read(uint8_t *reading);
 
 #ifdef __cplusplus
 }

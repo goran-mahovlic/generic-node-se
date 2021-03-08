@@ -110,9 +110,7 @@ static LmHandlerCallbacks_t LmHandlerCallbacks =
     {
         .GetBatteryLevel = GetBatteryLevel,
         .GetTemperature = GetTemperatureLevel,
-         .GetAS7341 = AS7341_read_ID,
-        .GetUniqueId = GetUniqueId,
-        .GetRandomSeed = GetRandomSeed,
+		.GetAS7341 = AS7341_read,
         .OnMacProcess = OnMacProcessNotify,
         .OnJoinRequest = OnJoinRequest,
         .OnTxData = OnTxData,
@@ -237,12 +235,13 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
 
 static void SendTxData(void)
 {
+  UTIL_TIMER_Time_t nextTxIn = 0;
+
   uint8_t reading[24];
   LmHandlerCallbacks.GetAS7341(reading);
-  UTIL_TIMER_Time_t nextTxIn = 0;
-  APP_PPRINTF("\r\n AS7341 ID: %x \r\n",reading);
+  //APP_PPRINTF("\r\n AS7341 ID: %x \r\n",reading);
   //UTIL_TIMER_Create(&TxLedTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTimerLedEvent, NULL);
-  //UTIL_TIMER_SetPeriod(&TxLedTimer, 200);
+  //UTIL_TIMER_SetPeriod(&TxLedTimer, 2000);
 
   // User can add any indication here (LED manipulation or Buzzer)
 

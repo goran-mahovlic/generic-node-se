@@ -40,7 +40,7 @@ void as7341_read_data_polling(uint8_t n_reads, uint32_t read_delay){
 	uint8_t readings[24];
     //uint8_t sensorID = 0x00;
     sensirion_i2c_init();
-    AS7341_read_ID(readings);
+    AS7341_read(readings);
 }
 
 void tempreture_sensor_read_data_polling(uint8_t n_reads, uint32_t read_delay)
