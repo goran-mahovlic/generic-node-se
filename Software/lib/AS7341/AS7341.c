@@ -56,7 +56,7 @@
 #define GAIN_X16 			  0x04
 #define GAIN_X64 			  0x07
 
-static const uint16_t AS7341_CMD_DURATION_USEC = 1000;
+static const uint16_t AS7341_CMD_DURATION_USEC = 10000;
 uint8_t d1[1] = {"\x92"};
 uint8_t buffor[1];
 uint8_t startup = 0;
@@ -72,19 +72,28 @@ HAL_StatusTypeDef writeRegisterByte(I2C_HandleTypeDef *hi2c, uint8_t address, ui
 }
 void setup_F1F4_Clear_NIR(I2C_HandleTypeDef *hi2c)
 {
+
+	/*
+	 * ADC0	0x01
+	 * ADC1 0x20
+	 * ADC2 0x30
+	 * ADC3 0x4
+	 * ADC4 0x50
+	 * ADC5 0x6
+	 */
 	  writeRegisterByte(hi2c, 0x00, 0x30);  // F3 left set to ADC2
 	  writeRegisterByte(hi2c, 0x01, 0x01);  // F1 left set to ADC0
 	  writeRegisterByte(hi2c, 0x02, 0x00);  // Reserved or disabled
 	  writeRegisterByte(hi2c, 0x03, 0x00);  // F8 left disabled
-	  writeRegisterByte(hi2c, 0x04, 0x42);  // F6 left disabled
-	  writeRegisterByte(hi2c, 0x05, 0x00);  // F4 left connected to ADC3/f2 left connected to ADC1
+	  writeRegisterByte(hi2c, 0x04, 0x00);  // F6 left disabled
+	  writeRegisterByte(hi2c, 0x05, 0x42);  // F4 left connected to ADC3/f2 left connected to ADC1
 	  writeRegisterByte(hi2c, 0x06, 0x00);  // F5 left disabled
-	  writeRegisterByte(hi2c, 0x07, 0x50);  // F7 left disabled
-	  writeRegisterByte(hi2c, 0x08, 0x00);  // CLEAR connected to ADC4
+	  writeRegisterByte(hi2c, 0x07, 0x00);  // F7 left disabled
+	  writeRegisterByte(hi2c, 0x08, 0x50);  // CLEAR connected to ADC4
 	  writeRegisterByte(hi2c, 0x09, 0x00);  // F5 right disabled
 	  writeRegisterByte(hi2c, 0x0A, 0x00);  // F7 right disabled
-	  writeRegisterByte(hi2c, 0x0B, 0x20);  // Reserved or disabled
-	  writeRegisterByte(hi2c, 0x0C, 0x04);  // F2 right connected to ADC1
+	  writeRegisterByte(hi2c, 0x0B, 0x00);  // Reserved or disabled
+	  writeRegisterByte(hi2c, 0x0C, 0x20);  // F2 right connected to ADC1
 	  writeRegisterByte(hi2c, 0x0D, 0x04);  // F4 right connected to ADC3
 	  writeRegisterByte(hi2c, 0x0E, 0x00);  // F6/F8 right disabled
 	  writeRegisterByte(hi2c, 0x0F, 0x30);  // F3 right connected to ADC2
@@ -101,15 +110,15 @@ void setup_F5F8_Clear_NIR(I2C_HandleTypeDef *hi2c)
 	  writeRegisterByte(hi2c, 0x03, 0x40); // F8 left connected to ADC3
 	  writeRegisterByte(hi2c, 0x04, 0x02); // F6 left connected to ADC1
 	  writeRegisterByte(hi2c, 0x05, 0x00); // F4/ F2 disabled
-	  writeRegisterByte(hi2c, 0x06, 0x20); // F5 left connected to ADC0
+	  writeRegisterByte(hi2c, 0x06, 0x10); // F5 left connected to ADC0
 	  writeRegisterByte(hi2c, 0x07, 0x03); // F7 left connected to ADC2
 	  writeRegisterByte(hi2c, 0x08, 0x50); // CLEAR Connected to ADC4
-	  writeRegisterByte(hi2c, 0x09, 0x20); // F5 right connected to ADC0
+	  writeRegisterByte(hi2c, 0x09, 0x10); // F5 right connected to ADC0
 	  writeRegisterByte(hi2c, 0x0A, 0x03); // F7 right connected to ADC2
 	  writeRegisterByte(hi2c, 0x0B, 0x00); // Reserved or disabled
 	  writeRegisterByte(hi2c, 0x0C, 0x00); // F2 right disabled
 	  writeRegisterByte(hi2c, 0x0D, 0x00); // F4 right disabled
-	  writeRegisterByte(hi2c, 0x0E, 0x24); // F8 right connected to ADC2/ F6 right connected to ADC1
+	  writeRegisterByte(hi2c, 0x0E, 0x24); // F8 right connected to ADC3/ F6 right connected to ADC1
 	  writeRegisterByte(hi2c, 0x0F, 0x00); // F3 right disabled
 	  writeRegisterByte(hi2c, 0x10, 0x00); // F1 right disabled
 	  writeRegisterByte(hi2c, 0x11, 0x50); // CLEAR right connected to AD4
@@ -233,7 +242,7 @@ void setSMUXLowChannels(I2C_HandleTypeDef *hi2c, uint8_t f1_f4)
   //uint8_t set_reg = CFG0_VAL_DEF | (0 << 4);
   //writeRegisterByte(&GNSE_BSP_ext_sensor_i2c2, set_reg, CFG0_VAL_REG1);
   writeRegisterByte(&GNSE_BSP_ext_sensor_i2c2,0xAF,0x10);
-  if (f1_f4)
+  if (f1_f4 >= 1)
   {
     setup_F1F4_Clear_NIR(hi2c);
   }
@@ -244,8 +253,8 @@ void setSMUXLowChannels(I2C_HandleTypeDef *hi2c, uint8_t f1_f4)
   writeRegisterByte(&GNSE_BSP_ext_sensor_i2c2,0xAF,0x10);
   //writeRegisterByte(&GNSE_BSP_ext_sensor_i2c2, set_reg, CFG0_VAL_REG1);
   uint8_t regVal;
-  HAL_I2C_Mem_Read(hi2c, SPECTR_ADDR, 0x80, 1, regVal, 1, AS7341_CMD_DURATION_USEC);
-  uint8_t temp = regVal;
+  HAL_I2C_Mem_Read(hi2c, SPECTR_ADDR, 0x80, 1, &regVal, 1, AS7341_CMD_DURATION_USEC);
+
   regVal = regVal & 0xEF;
   regVal = regVal | 0x10;
   writeRegisterByte(&GNSE_BSP_ext_sensor_i2c2,0x80, regVal);
