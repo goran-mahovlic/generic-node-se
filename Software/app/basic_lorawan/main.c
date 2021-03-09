@@ -104,8 +104,6 @@ int main(void)
 //  APP_PPRINTF("\r\n Testing Buzzer functionality \r\n");
 //  buzzer_play(NUMBER_BUZZER_PLAY, BUZZER_PLAY_INTERVAL);
 
-  HAL_I2C_MspInit(&GNSE_BSP_ext_sensor_i2c2);
-  GNSE_BSP_Ext_Sensor_I2C2_Init();
   uint8_t msg [24];
   AS7341_read(msg);
 
