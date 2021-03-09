@@ -164,7 +164,7 @@ void LoRaWAN_Init(void)
   {
     /* send every time timer elapses */
     UTIL_TIMER_Create(&TxTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTxTimerEvent, NULL);
-    UTIL_TIMER_SetPeriod(&TxTimer, APP_TX_DUTYCYCLE * 6 * 5); // 10 seconds * 6 * 5 -- every 5 min
+    UTIL_TIMER_SetPeriod(&TxTimer, APP_TX_DUTYCYCLE * 6 * 2); // 10 seconds * 6 * 5 -- every 5 min
     UTIL_TIMER_Start(&TxTimer);
   }
   else
