@@ -34,6 +34,7 @@
 #define ASTEP_ADDR_LSB  0xCA
 #define ASTEP_ADDR_MSB  0xCB
 #define CFG0_ADDR       0xA9
+#define CFG1_ADDR       0xAA
 #define LED_ADDR        0x74
 #define AS7341_CFG6     0xAF
 #define AS7341_STATUS2  0xA3
@@ -41,6 +42,7 @@
 
 #define CFG0_VAL_REG0         0b00000000  //  REGISTER BANK >= 0x80
 #define CFG0_VAL_REG1         0b00010000  //  REGISTER BANK 0x60 - 0x74   
+#define CFG0_VAL_DEF		  0x40
 #define TURN_ON_LED           0b00001000  // TURN LED ON
 #define TURN_OFF_LED          0b00000000  // TURN LED ON
 #define LED_VAL               0b10000100  // LED POWER CONTROL
@@ -51,8 +53,10 @@
 #define SPM_ON                0b00000011
 #define SPM_OFF               0b00000001
 #define AS7341_SMUX_CMD_WRITE 0b00000010
+#define GAIN_X16 			  0x04
+#define GAIN_X64 			  0x07
 
-static const uint16_t AS7341_CMD_DURATION_USEC = 2000;
+static const uint16_t AS7341_CMD_DURATION_USEC = 1000;
 uint8_t d1[1] = {"\x92"};
 uint8_t buffor[1];
 uint8_t startup = 0;
@@ -68,49 +72,49 @@ HAL_StatusTypeDef writeRegisterByte(I2C_HandleTypeDef *hi2c, uint8_t address, ui
 }
 void setup_F1F4_Clear_NIR(I2C_HandleTypeDef *hi2c)
 {
-  writeRegisterByte(hi2c, 0x00, 0x30);  // F3 left set to ADC2
-  writeRegisterByte(hi2c, 0x01, 0x01);  // F1 left set to ADC0
-  writeRegisterByte(hi2c, 0x02, 0x00);  // Reserved or disabled
-  writeRegisterByte(hi2c, 0x03, 0x00);  // F8 left disabled
-  writeRegisterByte(hi2c, 0x04, 0x00);  // F6 left disabled
-  writeRegisterByte(hi2c, 0x05, 0x42);  // F4 left connected to ADC3/f2 left connected to ADC1
-  writeRegisterByte(hi2c, 0x06, 0x00);  // F5 left disabled
-  writeRegisterByte(hi2c, 0x07, 0x00);  // F7 left disabled
-  writeRegisterByte(hi2c, 0x08, 0x50);  // CLEAR connected to ADC4
-  writeRegisterByte(hi2c, 0x09, 0x00);  // F5 right disabled
-  writeRegisterByte(hi2c, 0x0A, 0x00);  // F7 right disabled
-  writeRegisterByte(hi2c, 0x0B, 0x00);  // Reserved or disabled
-  writeRegisterByte(hi2c, 0x0C, 0x20);  // F2 right connected to ADC1
-  writeRegisterByte(hi2c, 0x0D, 0x04);  // F4 right connected to ADC3
-  writeRegisterByte(hi2c, 0x0E, 0x00);  // F6/F8 right disabled
-  writeRegisterByte(hi2c, 0x0F, 0x30);  // F3 right connected to ADC2
-  writeRegisterByte(hi2c, 0x10, 0x01);  // F1 right connected to ADC0
-  writeRegisterByte(hi2c, 0x11, 0x50);  // CLEAR right connected to ADC4
-  writeRegisterByte(hi2c, 0x12, 0x00);  // Reserved or disabled
-  writeRegisterByte(hi2c, 0x13, 0x06);  // NIR connected to ADC5
+	  writeRegisterByte(hi2c, 0x00, 0x30);  // F3 left set to ADC2
+	  writeRegisterByte(hi2c, 0x01, 0x01);  // F1 left set to ADC0
+	  writeRegisterByte(hi2c, 0x02, 0x00);  // Reserved or disabled
+	  writeRegisterByte(hi2c, 0x03, 0x00);  // F8 left disabled
+	  writeRegisterByte(hi2c, 0x04, 0x42);  // F6 left disabled
+	  writeRegisterByte(hi2c, 0x05, 0x00);  // F4 left connected to ADC3/f2 left connected to ADC1
+	  writeRegisterByte(hi2c, 0x06, 0x00);  // F5 left disabled
+	  writeRegisterByte(hi2c, 0x07, 0x50);  // F7 left disabled
+	  writeRegisterByte(hi2c, 0x08, 0x00);  // CLEAR connected to ADC4
+	  writeRegisterByte(hi2c, 0x09, 0x00);  // F5 right disabled
+	  writeRegisterByte(hi2c, 0x0A, 0x00);  // F7 right disabled
+	  writeRegisterByte(hi2c, 0x0B, 0x20);  // Reserved or disabled
+	  writeRegisterByte(hi2c, 0x0C, 0x04);  // F2 right connected to ADC1
+	  writeRegisterByte(hi2c, 0x0D, 0x04);  // F4 right connected to ADC3
+	  writeRegisterByte(hi2c, 0x0E, 0x00);  // F6/F8 right disabled
+	  writeRegisterByte(hi2c, 0x0F, 0x30);  // F3 right connected to ADC2
+	  writeRegisterByte(hi2c, 0x10, 0x01);  // F1 right connected to ADC0
+	  writeRegisterByte(hi2c, 0x11, 0x50);  // CLEAR right connected to ADC4
+	  writeRegisterByte(hi2c, 0x12, 0x00);  // Reserved or disabled
+	  writeRegisterByte(hi2c, 0x13, 0x06);  // NIR connected to ADC5
 }
 void setup_F5F8_Clear_NIR(I2C_HandleTypeDef *hi2c)
 {
-  writeRegisterByte(hi2c, 0x00, 0x00); // F3 left disable
-  writeRegisterByte(hi2c, 0x01, 0x00); // F1 left disable
-  writeRegisterByte(hi2c, 0x02, 0x00); // reserved/disable
-  writeRegisterByte(hi2c, 0x03, 0x40); // F8 left connected to ADC3
-  writeRegisterByte(hi2c, 0x04, 0x02); // F6 left connected to ADC1
-  writeRegisterByte(hi2c, 0x05, 0x00); // F4/ F2 disabled
-  writeRegisterByte(hi2c, 0x06, 0x10); // F5 left connected to ADC0
-  writeRegisterByte(hi2c, 0x07, 0x03); // F7 left connected to ADC2
-  writeRegisterByte(hi2c, 0x08, 0x50); // CLEAR Connected to ADC4
-  writeRegisterByte(hi2c, 0x09, 0x10); // F5 right connected to ADC0
-  writeRegisterByte(hi2c, 0x0A, 0x03); // F7 right connected to ADC2
-  writeRegisterByte(hi2c, 0x0B, 0x00); // Reserved or disabled
-  writeRegisterByte(hi2c, 0x0C, 0x00); // F2 right disabled
-  writeRegisterByte(hi2c, 0x0D, 0x00); // F4 right disabled
-  writeRegisterByte(hi2c, 0x0E, 0x24); // F8 right connected to ADC2/ F6 right connected to ADC1
-  writeRegisterByte(hi2c, 0x0F, 0x00); // F3 right disabled
-  writeRegisterByte(hi2c, 0x10, 0x00); // F1 right disabled
-  writeRegisterByte(hi2c, 0x11, 0x50); // CLEAR right connected to AD4
-  writeRegisterByte(hi2c, 0x12, 0x00); // Reserved or disabled
-  writeRegisterByte(hi2c, 0x13, 0x06); // NIR connected to ADC5
+	  writeRegisterByte(hi2c, 0x00, 0x00); // F3 left disable
+	  writeRegisterByte(hi2c, 0x01, 0x00); // F1 left disable
+	  writeRegisterByte(hi2c, 0x02, 0x00); // reserved/disable
+	  writeRegisterByte(hi2c, 0x03, 0x40); // F8 left connected to ADC3
+	  writeRegisterByte(hi2c, 0x04, 0x02); // F6 left connected to ADC1
+	  writeRegisterByte(hi2c, 0x05, 0x00); // F4/ F2 disabled
+	  writeRegisterByte(hi2c, 0x06, 0x20); // F5 left connected to ADC0
+	  writeRegisterByte(hi2c, 0x07, 0x03); // F7 left connected to ADC2
+	  writeRegisterByte(hi2c, 0x08, 0x50); // CLEAR Connected to ADC4
+	  writeRegisterByte(hi2c, 0x09, 0x20); // F5 right connected to ADC0
+	  writeRegisterByte(hi2c, 0x0A, 0x03); // F7 right connected to ADC2
+	  writeRegisterByte(hi2c, 0x0B, 0x00); // Reserved or disabled
+	  writeRegisterByte(hi2c, 0x0C, 0x00); // F2 right disabled
+	  writeRegisterByte(hi2c, 0x0D, 0x00); // F4 right disabled
+	  writeRegisterByte(hi2c, 0x0E, 0x24); // F8 right connected to ADC2/ F6 right connected to ADC1
+	  writeRegisterByte(hi2c, 0x0F, 0x00); // F3 right disabled
+	  writeRegisterByte(hi2c, 0x10, 0x00); // F1 right disabled
+	  writeRegisterByte(hi2c, 0x11, 0x50); // CLEAR right connected to AD4
+	  writeRegisterByte(hi2c, 0x12, 0x00); // Reserved or disabled
+	  writeRegisterByte(hi2c, 0x13, 0x06); // NIR connected to ADC5
 }
 HAL_StatusTypeDef getID(I2C_HandleTypeDef *hi2c, uint8_t *data)
 {
@@ -226,7 +230,9 @@ HAL_StatusTypeDef enableSMUX(I2C_HandleTypeDef *hi2c)
 void setSMUXLowChannels(I2C_HandleTypeDef *hi2c, uint8_t f1_f4)
 {
   enableSpectralMeasurement(hi2c, 0);
-  setSMUXCommand(hi2c, AS7341_SMUX_CMD_WRITE);
+  //uint8_t set_reg = CFG0_VAL_DEF | (0 << 4);
+  //writeRegisterByte(&GNSE_BSP_ext_sensor_i2c2, set_reg, CFG0_VAL_REG1);
+  writeRegisterByte(&GNSE_BSP_ext_sensor_i2c2,0xAF,0x10);
   if (f1_f4)
   {
     setup_F1F4_Clear_NIR(hi2c);
@@ -235,6 +241,15 @@ void setSMUXLowChannels(I2C_HandleTypeDef *hi2c, uint8_t f1_f4)
   {
     setup_F5F8_Clear_NIR(hi2c);
   }
+  writeRegisterByte(&GNSE_BSP_ext_sensor_i2c2,0xAF,0x10);
+  //writeRegisterByte(&GNSE_BSP_ext_sensor_i2c2, set_reg, CFG0_VAL_REG1);
+  uint8_t regVal;
+  HAL_I2C_Mem_Read(hi2c, SPECTR_ADDR, 0x80, 1, regVal, 1, AS7341_CMD_DURATION_USEC);
+  uint8_t temp = regVal;
+  regVal = regVal & 0xEF;
+  regVal = regVal | 0x10;
+  writeRegisterByte(&GNSE_BSP_ext_sensor_i2c2,0x80, regVal);
+  //setSMUXCommand(hi2c, AS7341_SMUX_CMD_WRITE);
   enableSMUX(hi2c);
   enableSpectralMeasurement(hi2c, 1);
   //if (enableSMUX(hi2c) != HAL_OK)
@@ -272,13 +287,28 @@ void readAllChannel(I2C_HandleTypeDef *hi2c, uint8_t *reading)
   }
 }
 
+void AS7341_setup(){
+	setupIntegration(&GNSE_BSP_ext_sensor_i2c2,29,599);
+	// Set gain x16
+	writeRegisterByte(&GNSE_BSP_ext_sensor_i2c2, CFG1_ADDR, GAIN_X64);  // F3 left set to ADC2
+}
+
 void AS7341_read(uint8_t *reading) {
 	GNSE_BSP_Ext_Sensor_I2C2_Init();
 	getID(&GNSE_BSP_ext_sensor_i2c2, d1);
 	chipEnable(&GNSE_BSP_ext_sensor_i2c2);
+	AS7341_setup();
 //	turnOnLED(&GNSE_BSP_ext_sensor_i2c2);
 	readAllChannel(&GNSE_BSP_ext_sensor_i2c2, reading);
 //	turnOffLED(&GNSE_BSP_ext_sensor_i2c2);
 	writeRegisterByte(&GNSE_BSP_ext_sensor_i2c2, LOW_POWER, CFG0_VAL_REG1);  // Set sleep to ON
 	chipDisable(&GNSE_BSP_ext_sensor_i2c2);
 }
+
+//  //Integration time = (ATIME + 1) x (ASTEP + 1) x 2.78µs
+//  //Set the value of register ATIME, through which the value of Integration time can be calculated. The value represents the time that must be spent during data reading.
+//  as7341.setAtime(29);
+//  //Set the value of register ASTEP, through which the value of Integration time can be calculated. The value represents the time that must be spent during data reading.
+//  as7341.setAstep(599);
+//  //Set gain value(0~10 corresponds to X0.5,X1,X2,X4,X8,X16,X32,X64,X128,X256,X512)
+//  as7341.setAGAIN(7);
