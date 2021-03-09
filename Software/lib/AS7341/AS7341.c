@@ -52,7 +52,7 @@
 #define SPM_OFF               0b00000001
 #define AS7341_SMUX_CMD_WRITE 0b00000010
 
-static const uint16_t AS7341_CMD_DURATION_USEC = 1000;
+static const uint16_t AS7341_CMD_DURATION_USEC = 2000;
 uint8_t d1[1] = {"\x92"};
 uint8_t buffor[1];
 uint8_t startup = 0;
@@ -226,7 +226,7 @@ HAL_StatusTypeDef enableSMUX(I2C_HandleTypeDef *hi2c)
 void setSMUXLowChannels(I2C_HandleTypeDef *hi2c, uint8_t f1_f4)
 {
   enableSpectralMeasurement(hi2c, 0);
- // setSMUXLowChannels(hi2c, AS7341_SMUX_CMD_WRITE);
+  setSMUXCommand(hi2c, AS7341_SMUX_CMD_WRITE);
   if (f1_f4)
   {
     setup_F1F4_Clear_NIR(hi2c);
@@ -236,6 +236,7 @@ void setSMUXLowChannels(I2C_HandleTypeDef *hi2c, uint8_t f1_f4)
     setup_F5F8_Clear_NIR(hi2c);
   }
   enableSMUX(hi2c);
+  enableSpectralMeasurement(hi2c, 1);
   //if (enableSMUX(hi2c) != HAL_OK)
     // HAL_GPIO_WritePin(LD5_GPIO_Port, LD5_Pin, GPIO_PIN_SET);
 }
@@ -257,19 +258,27 @@ void waitForData(I2C_HandleTypeDef *hi2c)
 }
 void readAllChannel(I2C_HandleTypeDef *hi2c, uint8_t *reading)
 {
-  setSMUXLowChannels(hi2c, 1);
-  enableSpectralMeasurement(hi2c, 1);
+  uint8_t read_f1f4[12];
+  uint8_t read_f5f8[12];
+  setSMUXLowChannels(hi2c,1);
   waitForData(hi2c);
-  HAL_I2C_Mem_Read(hi2c, SPECTR_ADDR, AS7341_CH0_DATA_L, 1, reading, 12, AS7341_CMD_DURATION_USEC);
+  HAL_I2C_Mem_Read(hi2c, SPECTR_ADDR, AS7341_CH0_DATA_L, 1, read_f1f4, 12, AS7341_CMD_DURATION_USEC);
+  setSMUXLowChannels(hi2c,0);
+  waitForData(hi2c);
+  HAL_I2C_Mem_Read(hi2c, SPECTR_ADDR, AS7341_CH0_DATA_L, 1, read_f5f8, 12, AS7341_CMD_DURATION_USEC);
+  for (int i=0;i<12;i++){
+    reading[i] = read_f1f4[i];
+    reading[i+12] = read_f5f8[i];
+  }
 }
 
 void AS7341_read(uint8_t *reading) {
 	GNSE_BSP_Ext_Sensor_I2C2_Init();
 	getID(&GNSE_BSP_ext_sensor_i2c2, d1);
 	chipEnable(&GNSE_BSP_ext_sensor_i2c2);
-	turnOnLED(&GNSE_BSP_ext_sensor_i2c2);
+//	turnOnLED(&GNSE_BSP_ext_sensor_i2c2);
 	readAllChannel(&GNSE_BSP_ext_sensor_i2c2, reading);
-	turnOffLED(&GNSE_BSP_ext_sensor_i2c2);
+//	turnOffLED(&GNSE_BSP_ext_sensor_i2c2);
 	writeRegisterByte(&GNSE_BSP_ext_sensor_i2c2, LOW_POWER, CFG0_VAL_REG1);  // Set sleep to ON
 	chipDisable(&GNSE_BSP_ext_sensor_i2c2);
 }
