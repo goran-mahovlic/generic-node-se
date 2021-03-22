@@ -44,3 +44,42 @@ Message|Description
 0x05 0x01 0xF3 | Set ASTEP to 499
 0x06 0x05 | Set gain to 5 (maximum is 10)
 0x07 | Reset node
+
+### Node Encoder
+
+![node-red (node-red)](node.png)
+
+'''
+var buff = new Buffer(msg.payload.uplink_message.frm_payload, 'base64'); // put in msg.payload the payload raw data stored initially as Base64
+
+var d1 = buff[1] << 8 | buff[0];
+var d2 = buff[3] << 8 | buff[2];
+var d3 = buff[5] << 8 | buff[4];
+var d4 = buff[7] << 8 | buff[6];
+var d5 = buff[9] << 8 | buff[8];
+var d6 = buff[11] << 8 | buff[10];
+var d7 = buff[13] << 8 | buff[12];
+var d8 = buff[15] << 8 | buff[14];
+var d9 = buff[17] << 8 | buff[16];
+var d10 = buff[19] << 8 | buff[18];
+var d11 = buff[21] << 8 | buff[20];
+var d12 = buff[23] << 8 | buff[22];
+
+msg.payload = {
+    "ADC0/F1 415nm":d1, 
+    "ADC1/F2 445nm":d2,
+    "ADC2/F3 480nm":d3, 
+    "ADC3/F4 515nm":d4, 
+    "ADC4/Clear_0":d5, 
+    "ADC5/NIR_0":d6,
+    "ADC0/F5 555nm":d7, 
+    "ADC1/F6 590nm":d8, 
+    "ADC2/F7 630nm":d9, 
+    "ADC3/F8 680nm":d10, 
+    "ADC4/Clear_1":d11, 
+    "ADC5/NIR_1":d12, 
+    "RAW":buff
+};
+
+return msg;
+'''
