@@ -72,11 +72,11 @@ void SystemApp_Init(void)
   DBG_Init();
 
   /*Initialize the terminal */
-  UTIL_ADV_TRACE_Init();
-  UTIL_ADV_TRACE_RegisterTimeStampFunction(TimestampNow);
+//  UTIL_ADV_TRACE_Init();
+//  UTIL_ADV_TRACE_RegisterTimeStampFunction(TimestampNow);
 
   /*Set verbose LEVEL*/
-  UTIL_ADV_TRACE_SetVerboseLevel(VLEVEL_M);
+//  UTIL_ADV_TRACE_SetVerboseLevel(VLEVEL_M);
 
   /* Here user can init the board peripherals and sensors */
 

@@ -25,9 +25,61 @@
 #include "stm32_seq.h"
 #include "sys_app.h"
 #include "lora_app.h"
+#include "app.h"
+#include "stm32_timer.h"
+
+WWDG_HandleTypeDef WwdgHandle;
+IWDG_HandleTypeDef IwdgHandle;
+static UTIL_TIMER_Object_t IwdgTimer;
 
 static void SystemClock_Config(void);
 static void Error_Handler(void);
+static void IWDG_OnTimer(void *context);
+void IWDG_StartTimer(void);
+
+//void temperature_sensor_read_data_polling(uint8_t n_reads, uint32_t read_delay);
+
+void WWDG_Start(void){
+	  /*##-1- Check if the system has resumed from WWDG reset ####################*/
+	  if(__HAL_RCC_GET_FLAG(RCC_FLAG_WWDGRST) != RESET)
+	  {
+	    /* Clear reset flags */
+	    __HAL_RCC_CLEAR_RESET_FLAGS();
+	  }
+	  /*##-2- Configure the WWDG peripheral ######################################*/
+	  /* WWDG clock counter = (PCLK1 (42MHz)/4096)/8) = 1281 Hz (~780 us)
+	     WWDG Window value = 80 means that the WWDG counter should be refreshed only
+	     when the counter is below 80 (and greater than 64) otherwise a reset will
+	     be generated.
+	     WWDG Counter value = 127, WWDG timeout = ~780 us * 64 = 49.9 ms */
+	  WwdgHandle.Instance = WWDG;
+	  WwdgHandle.Init.Prescaler = WWDG_PRESCALER_128;
+	  WwdgHandle.Init.Window    = 120;
+	  WwdgHandle.Init.Counter   = 127;
+
+	  if(HAL_WWDG_Init(&WwdgHandle) != HAL_OK)
+	  {
+	    /* Initialization Error */
+	    //Error_Handler();
+	  }
+
+}
+
+void IWDG_Start(void){
+	HAL_IWDG_Init(&IwdgHandle);
+	HAL_IWDG_Refresh(&IwdgHandle);
+}
+
+static void IWDG_OnTimer(void *context){
+	HAL_IWDG_Refresh(&IwdgHandle);
+	IWDG_StartTimer();
+}
+
+void IWDG_StartTimer(void){
+	UTIL_TIMER_Create(&IwdgTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, IWDG_OnTimer, NULL);
+	UTIL_TIMER_SetPeriod(&IwdgTimer, 20000);
+	UTIL_TIMER_Start(&IwdgTimer);
+}
 
 void MX_LoRaWAN_Init(void)
 {
@@ -42,9 +94,15 @@ void MX_LoRaWAN_Process(void)
 
 int main(void)
 {
+  WWDG_Start();
   HAL_Init();
   SystemClock_Config();
+  __HAL_RCC_WWDG_CLK_DISABLE();
+
   MX_LoRaWAN_Init();
+  //IWDG_Start();
+  //IWDG_StartTimer();
+  //temperature_sensor_read_data_polling(NUMBER_TEMPERATURE_SENSOR_READ, TEMPERATURE_SENSOR_READ_INTERVAL);
   while (1)
   {
     MX_LoRaWAN_Process();
@@ -62,7 +120,7 @@ void SystemClock_Config(void)
 
   /** Configure LSE Drive Capability
   */
-  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
+  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_HIGH);
   /** Configure the main internal regulator output voltage
   */
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
@@ -105,10 +163,11 @@ void Error_Handler(void)
   * A basic Implementation below
   * TODO: Improve with system wide error handler, see https://github.com/TheThingsIndustries/generic-node-se/issues/57
   */
-  GNSE_BSP_LED_Init(LED_RED);
-  GNSE_BSP_LED_On(LED_RED);
-  GNSE_LPM_EnterStopMode();
-  while (1)
-  {
-  }
+  //GNSE_BSP_LED_Init(LED_RED);
+  //GNSE_BSP_LED_On(LED_RED);
+  NVIC_SystemReset();
+ // GNSE_LPM_EnterStopMode();
+ // while (1)
+ // {
+ // }
 }

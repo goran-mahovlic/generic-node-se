@@ -26,6 +26,30 @@
 #include "stm32_lpm.h"
 #include "LmHandler.h"
 #include "lora_info.h"
+#include "AS7341.h"
+
+// For time change
+// TYPE MINUTES
+// 0x01 0x02  // After next downlink node will send every two minutes
+// For LED change
+// TYPE SET
+// 0x02 0x01  // After next downlink LED on sensor will be used
+#define SET_TIME 0x01     // 1 byte time in minutes
+#define SET_LED 0x02      // 1 byte 1(ON)/0(OFF)
+#define SET_REGISTER 0x03 // 2 bytes 1. register 2. data
+#define SET_ATIME 0x04    // 1 byte  ATIME
+#define SET_ASTEP 0x05    // 2 bytes 1. ASTEP HIGH 2. ASTEP LOW
+#define SET_GAIN 0x06     // 1 byte GAIN
+#define SET_WTIME 0x07    // 1 byte WTIME
+#define RESET_NODE 0x08   // reset
+#define GET_REGISTER 0x09 // not implemented
+
+
+uint8_t as7341_RX[40] = {'\0'};
+uint8_t firstStart = 1;
+volatile uint8_t minutes = 1;
+volatile uint8_t ledStatus = 0;
+volatile uint8_t time_multiply = 6; // Needs to be 6 if we want to set time in minutes
 
 /**
   * @brief LoRa State Machine states
@@ -163,7 +187,7 @@ void LoRaWAN_Init(void)
   {
     /* send every time timer elapses */
     UTIL_TIMER_Create(&TxTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTxTimerEvent, NULL);
-    UTIL_TIMER_SetPeriod(&TxTimer, APP_TX_DUTYCYCLE);
+    UTIL_TIMER_SetPeriod(&TxTimer, APP_TX_DUTYCYCLE * time_multiply * minutes);
     UTIL_TIMER_Start(&TxTimer);
   }
   else
@@ -224,6 +248,46 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
       break;
     case LORAWAN_APP_PORT:
       APP_LOG(TS_OFF, VLEVEL_M, "\r\n Recieved %d bytes on LORAWAN_APP_PORT: %d \r\n", appData->BufferSize, LORAWAN_APP_PORT);
+
+      switch(appData->Buffer[0]){
+      	  case SET_TIME:
+      	      minutes = appData->Buffer[1];
+      	      if (minutes == 0){minutes=1;}
+      	      //UTIL_TIMER_Create(&TxTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTxTimerEvent, NULL);
+      	      UTIL_TIMER_SetPeriod(&TxTimer, APP_TX_DUTYCYCLE * time_multiply * minutes);
+      	      UTIL_TIMER_Start(&TxTimer);
+      	      //UTIL_TIMER_Create(&TxLedTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTimerLedEvent, NULL);
+      	      UTIL_TIMER_SetPeriod(&TxLedTimer, (APP_TX_DUTYCYCLE * time_multiply * minutes) - 5000);
+      	      UTIL_TIMER_Start(&TxLedTimer);
+    	  break;
+      	  case SET_LED:
+      	      ledStatus = appData->Buffer[1];
+      	      if (ledStatus>1){ledStatus=1;}
+    	  break;
+      	  case SET_REGISTER:
+      		AS7341_writeRegister(appData->Buffer[1], appData->Buffer[2]);
+    	  break;
+      	  case SET_ATIME:
+      		AS7341_setATIME(appData->Buffer[1]);
+    	  break;
+      	  case SET_ASTEP:
+      		AS7341_setASTEP(appData->Buffer[2] << 8 | appData->Buffer[1]);
+    	  break;
+      	  case SET_GAIN:
+      		if (appData->Buffer[1] > 10){ appData->Buffer[1] = 10;}
+      		AS7341_setGAIN(appData->Buffer[1]);
+    	  break;
+      	  case SET_WTIME:
+      		AS7341_setWTIME(appData->Buffer[1]);
+    	  break;
+      	  case GET_REGISTER:
+    	  break;
+      	  case RESET_NODE:
+      		  NVIC_SystemReset();
+    	  break;
+      	  default:
+    	  break;
+      }
       break;
     default:
       APP_LOG(TS_OFF, VLEVEL_M, "\r\n Recieved %d bytes on undefined port: %d \r\n", appData->BufferSize, LORAWAN_APP_PORT);
@@ -237,17 +301,20 @@ static void SendTxData(void)
   UTIL_TIMER_Time_t nextTxIn = 0;
 
   UTIL_TIMER_Create(&TxLedTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTimerLedEvent, NULL);
-  UTIL_TIMER_SetPeriod(&TxLedTimer, 200);
-
+  UTIL_TIMER_SetPeriod(&TxLedTimer, (APP_TX_DUTYCYCLE * time_multiply * minutes) - 5000);
+  // Read only once here to set value in first message
+  if(firstStart){firstStart = 0;AS7341_read(as7341_RX, ledStatus);}
   // User can add any indication here (LED manipulation or Buzzer)
-
+  uint8_t AS7341_size = 24;
   UTIL_TIMER_Start(&TxLedTimer);
-
   AppData.Port = LORAWAN_APP_PORT;
-  AppData.BufferSize = 3;
-  AppData.Buffer[0] = 0xAA;
-  AppData.Buffer[1] = 0xBB;
-  AppData.Buffer[2] = 0xCC;
+  AppData.BufferSize = AS7341_size;
+  for (int i= 0;i<AS7341_size;i++){
+	  AppData.Buffer[i] = as7341_RX[i];
+  }
+  memset(as7341_RX, 0, sizeof(as7341_RX));
+  //AppData.Buffer[1] = 0xBB;
+  //AppData.Buffer[2] = 0xCC;
 
   if (LORAMAC_HANDLER_SUCCESS == LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, &nextTxIn, false))
   {
@@ -270,6 +337,7 @@ static void OnTxTimerEvent(void *context)
 static void OnTimerLedEvent(void *context)
 {
   // User can add any indication here (LED manipulation or Buzzer)
+	AS7341_read(as7341_RX, ledStatus);
 }
 
 static void OnTxData(LmHandlerTxParams_t *params)

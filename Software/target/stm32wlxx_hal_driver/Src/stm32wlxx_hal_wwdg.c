@@ -133,7 +133,7 @@
   * @{
   */
 
-#ifdef HAL_WWDG_MODULE_ENABLED
+//#ifdef HAL_WWDG_MODULE_ENABLED
 /** @defgroup WWDG WWDG
   * @brief WWDG HAL module driver.
   * @{
@@ -411,7 +411,7 @@ __weak void HAL_WWDG_EarlyWakeupCallback(WWDG_HandleTypeDef *hwwdg)
   * @}
   */
 
-#endif /* HAL_WWDG_MODULE_ENABLED */
+//#endif /* HAL_WWDG_MODULE_ENABLED */
 /**
   * @}
   */

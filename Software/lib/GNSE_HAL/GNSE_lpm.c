@@ -23,6 +23,8 @@
 #include "GNSE_lpm.h"
 #include "usart_if.h"
 
+extern uint8_t sensorDone;
+
 /**
   * @brief Power driver callbacks handler
   */
@@ -89,7 +91,7 @@ void GNSE_LPM_ExitStopMode(void)
     SRAM ctrls, DMAx, DMAMux, AES, RNG, HSEM  */
 
   /* Resume not retained USARTx and DMA */
-  vcom_Resume();
+//  vcom_Resume();
 }
 
 /**
