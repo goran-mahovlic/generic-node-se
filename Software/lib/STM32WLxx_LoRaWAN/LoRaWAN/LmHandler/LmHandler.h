@@ -147,6 +147,12 @@ typedef struct LmHandlerCallbacks_s
    */
   /*float*/ uint16_t (*GetTemperature)(void);
   /*!
+   * Get the current AS7341 readings
+   *
+   * \retval value  ID
+   */
+  void ( *GetAS7341 )( uint8_t *id );
+  /*!
    * \brief    Will be called each time a Radio IRQ is handled by the MAC
    *          layer.
    *

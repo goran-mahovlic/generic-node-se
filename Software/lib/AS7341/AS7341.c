@@ -365,7 +365,6 @@ void AS7341_setGAIN(uint8_t gain){
 void AS7341_writeRegister(uint8_t reg, uint8_t value){
 	__HAL_RCC_WWDG_CLK_ENABLE();
 	WWDG_Reset();
-	sensorDone = 1;
 	GNSE_BSP_Ext_Sensor_I2C2_Init();
 	enableSpectralMeasurement(0);
 	if (reg<0x74){
@@ -379,14 +378,12 @@ void AS7341_writeRegister(uint8_t reg, uint8_t value){
 	checkHAL();
 	AS7341_lowpower();
 	chipEnable(0);
-	sensorDone = 0;
 	__HAL_RCC_WWDG_CLK_DISABLE();
 }
 
 void AS7341_read(uint8_t *reading, uint8_t useLED) {
 	__HAL_RCC_WWDG_CLK_ENABLE();
 	WWDG_Reset();
-	sensorDone = 1;
 	GNSE_BSP_Ext_Sensor_I2C2_Init();
 	//getID(reading);
 	chipEnable(1);
@@ -405,6 +402,5 @@ void AS7341_read(uint8_t *reading, uint8_t useLED) {
 	checkHAL();
 	AS7341_lowpower();
 	chipEnable(0);
-	sensorDone = 0;
 	__HAL_RCC_WWDG_CLK_DISABLE();
 }
