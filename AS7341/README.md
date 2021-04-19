@@ -24,7 +24,7 @@ Working node consumption should be around 5uA in sleep mode.
 
 Name|Type|Size|Description|Usage
 --|--|--|--|--
-SET_TIME|0x01|1 byte|Time in minutes
+SET_TIME|0x01|2 bytes|Time in minutes
 SET_LED|0x02|1 byte| 1(ON)/0(OFF)
 SET_REGISTER|0x03|2 bytes|1. register 2. data
 SET_ATIME|0x04|1 byte|Setting ATIME
@@ -36,7 +36,8 @@ RESET_NODE|0x08|0 bytes
 
 Message|Description
 --|--
-0x01 0x05 | Set interval to 5 minutes
+0x01 0x00 0x05 | Set interval to 5 minutes
+0x01 0x05 0x00 | Set interval to 1280 minutes
 0x02 0x01 | Use LED
 0x02 0x00 | do not use LED
 0x03 0x80 0x00 | Write 0x00 to register 0x80
