@@ -85,6 +85,8 @@ Node can reset from time to time - if that happens it has detected I2C HAL error
 
 After reset node will rejoin and stay in low consumption
 
+Settings (send time, astep, atime) are not saved into eeprom - so after each reset node will have default settings.
+
 On test node with harvester board I coul not use SF12 that is in default code, after switching to SF10 wverything works.
 
-on test node send interval is set on one hour
+On test node send interval is set on 60 minutes
