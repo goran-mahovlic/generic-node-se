@@ -51,3 +51,28 @@ Message|Description
 ![node-red (node-red)](node.png)
 
 https://github.com/goran-mahovlic/generic-node-se/tree/develop/AS7341/node.function
+
+### AS7341 values
+
+#### Gain
+
+Gain value is set by this table from datasheet - 
+you can send values from 0 - 10 that will set gain from 0.5X- 512X
+
+![gain-set (gain-set)](AS7341_gain.png)
+
+#### ATIME
+
+SET_ATIME values from 0 - 255
+
+![atime-set (atime-set)](AS7341_atime.png)
+
+#### STEP
+
+SET_STEP range is from 0 to 65534
+
+![step-set (step-set)](AS7341_step.png)
+
+#### SET_REGISTER
+
+SET_REGISTER - it is left for debugging purpose - with this we can set directly any register of AS7341
