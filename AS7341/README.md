@@ -76,3 +76,15 @@ SET_STEP range is from 0 to 65534
 #### SET_REGISTER
 
 SET_REGISTER - it is left for debugging purpose - with this we can set directly any register of AS7341
+
+### Known bugs
+
+On first version of code SET_TIME and SET_ASTEP bytes are switched
+
+Node can reset from time to time - if that happens it has detected I2C HAL error and stayed in higher consuption.
+
+After reset node will rejoin and stay in low consumption
+
+On test node with harvester board I coul not use SF12 that is in default code, after switching to SF10 wverything works.
+
+on test node send interval is set on one hour
