@@ -47,7 +47,7 @@
 
 uint8_t as7341_RX[40] = {'\0'};
 uint8_t firstStart = 1;
-volatile uint8_t minutes = 1;
+volatile uint16_t minutes = 60;
 volatile uint8_t ledStatus = 0;
 volatile uint8_t time_multiply = 6; // Needs to be 6 if we want to set time in minutes
 
@@ -251,7 +251,7 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
 
       switch(appData->Buffer[0]){
       	  case SET_TIME:
-      	      minutes = appData->Buffer[1];
+      	      minutes = appData->Buffer[1] << 8 | appData->Buffer[2];
       	      if (minutes == 0){minutes=1;}
       	      //UTIL_TIMER_Create(&TxTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTxTimerEvent, NULL);
       	      UTIL_TIMER_SetPeriod(&TxTimer, APP_TX_DUTYCYCLE * time_multiply * minutes);
@@ -271,7 +271,7 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
       		AS7341_setATIME(appData->Buffer[1]);
     	  break;
       	  case SET_ASTEP:
-      		AS7341_setASTEP(appData->Buffer[2] << 8 | appData->Buffer[1]);
+      		AS7341_setASTEP(appData->Buffer[1] << 8 | appData->Buffer[2]);
     	  break;
       	  case SET_GAIN:
       		if (appData->Buffer[1] > 10){ appData->Buffer[1] = 10;}

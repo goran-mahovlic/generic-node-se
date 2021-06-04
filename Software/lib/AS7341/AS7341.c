@@ -34,6 +34,8 @@ HAL_StatusTypeDef res;
 
 HAL_StatusTypeDef writeRegisterByte(uint8_t address, uint8_t data)
 {
+  // Added for stability
+  HAL_Delay(1);
   res = HAL_I2C_Mem_Write(&GNSE_BSP_ext_sensor_i2c2, SPECTR_ADDR, address, 1, &data, 1, AS7341_CMD_DURATION_USEC);
   return res;
 }
