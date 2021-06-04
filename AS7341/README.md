@@ -24,7 +24,7 @@ Working node consumption should be around 5uA in sleep mode.
 
 Name|Type|Size|Description|Usage
 --|--|--|--|--
-SET_TIME|0x01|1 byte|Time in minutes
+SET_TIME|0x01|2 bytes|Time in minutes
 SET_LED|0x02|1 byte| 1(ON)/0(OFF)
 SET_REGISTER|0x03|2 bytes|1. register 2. data
 SET_ATIME|0x04|1 byte|Setting ATIME
@@ -36,7 +36,8 @@ RESET_NODE|0x08|0 bytes
 
 Message|Description
 --|--
-0x01 0x05 | Set interval to 5 minutes
+0x01 0x00 0x05 | Set interval to 5 minutes
+0x01 0x05 0x00 | Set interval to 1280 minutes
 0x02 0x01 | Use LED
 0x02 0x00 | do not use LED
 0x03 0x80 0x00 | Write 0x00 to register 0x80
@@ -50,3 +51,42 @@ Message|Description
 ![node-red (node-red)](node.png)
 
 https://github.com/goran-mahovlic/generic-node-se/tree/develop/AS7341/node.function
+
+### AS7341 values
+
+#### Gain
+
+Gain value is set by this table from datasheet - 
+you can send values from 0 - 10 that will set gain from 0.5X- 512X
+
+![gain-set (gain-set)](AS7341_gain.png)
+
+#### ATIME
+
+SET_ATIME values from 0 - 255
+
+![atime-set (atime-set)](AS7341_atime.png)
+
+#### STEP
+
+SET_STEP range is from 0 to 65534
+
+![step-set (step-set)](AS7341_step.png)
+
+#### SET_REGISTER
+
+SET_REGISTER - it is left for debugging purpose - with this we can set directly any register of AS7341
+
+### Known bugs
+
+On first version of code SET_TIME and SET_ASTEP bytes are switched
+
+Node can reset from time to time - if that happens it has detected I2C HAL error and stayed in higher consuption.
+
+After reset node will rejoin and stay in low consumption
+
+Settings (send time, astep, atime) are not saved into eeprom - so after each reset node will have default settings.
+
+On test node with harvester board I coul not use SF12 that is in default code, after switching to SF10 wverything works.
+
+On test node send interval is set on 60 minutes
