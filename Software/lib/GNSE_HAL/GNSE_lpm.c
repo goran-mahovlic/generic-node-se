@@ -21,7 +21,7 @@
  */
 
 #include "GNSE_lpm.h"
-#include "usart_if.h"
+#include "GNSE_tracer.h"
 
 extern uint8_t sensorDone;
 
@@ -92,6 +92,7 @@ void GNSE_LPM_ExitStopMode(void)
 
   /* Resume not retained USARTx and DMA */
 //  vcom_Resume();
+  GNSE_TRACER_RESUME();
 }
 
 /**

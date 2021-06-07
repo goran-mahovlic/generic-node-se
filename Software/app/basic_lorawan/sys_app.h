@@ -25,10 +25,10 @@ extern "C" {
 #endif
 
 #include "stdint.h"
-#include "stm32_adv_trace.h"
+#include "GNSE_tracer.h"
 
 /**
-  * @brief initialises the system (dbg pins, trace, systiemr, LPM, ...)
+  * @brief initialises the system (dbg pins, trace, systimer, LPM, ...)
   * @param none
   * @return  none
   */

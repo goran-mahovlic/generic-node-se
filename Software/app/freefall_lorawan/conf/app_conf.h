@@ -24,12 +24,15 @@
 #ifndef APP_CONF_H
 #define APP_CONF_H
 
-#define APP_LOG_ENABLED 1
+#define GNSE_ADVANCED_TRACER_ENABLE 1
 
-/* if ON (=1) it enables the debbugger plus 4 dgb pins */
+/* if ON (=1) it enables the debugger plus 4 dbg pins */
 /* if OFF (=0) the debugger is OFF (lower consumption) */
 #define DEBUGGER_ON       0
 
+/* if ON (=1) the independent watchdog timer is used (reset MCU after inactivity) */
+/* if OFF (=0) the independent watchdog timer is not used */
+#define IWDG_TIMER_ON     0
 
 /* LOW_POWER_DISABLE = 0 : LowPowerMode enabled : MCU enters stop2 mode*/
 /* LOW_POWER_DISABLE = 1 : LowPowerMode disabled : MCU enters sleep mode only */
@@ -55,9 +58,17 @@
 #define ACC_FF_ODR LIS2DH12_ODR_100Hz
 
 /**
- * This variable sets the LoRaWAN transmission port of Freefall events
+ * This variable sets the LoRaWAN transmission port of free fall events
  */
 #define ACC_FF_LORA_PORT 2
+
+/**
+ * Downlink defs
+ */
+/* This variable sets the LoRaWAN downlink port for locally indicating free fall events */
+#define ACC_FF_DOWNLINK_PORT 1
+/* Time in milliseconds the downlink callback (controlling the buzzer) will be initiated */
+#define ACC_FF_DOWNLINK_TIME_MS 2000
 
 /**
   * Supported requester to the MCU Low Power Manager - can be increased up  to 32
@@ -68,6 +79,7 @@ typedef enum
   CFG_LPM_APPLI_Id,
   CFG_LPM_UART_TX_Id,
   CFG_LPM_TCXO_WA_Id,
+  CFG_LPM_FF_ACC_Id,
 } CFG_LPM_Id_t;
 
 /**

@@ -5,11 +5,11 @@ The software provides a boilerplate of applications and libraries that can be us
 
 - [target](./target/README.md) folder contains STM32WL low level target files
 - [lib](./lib/README.md) folder contains SW libraries used by the various applications
-- [app](./app/README.md) folder contains SW applicattions
+- [app](./app/README.md) folder contains SW applications
 
 ## Documentation
 
-The [Generic Node documentation website](https://thethingsindustries.github.io/generic-node-docs/) provides information about the software features and how to [get started with the software development](https://thethingsindustries.github.io/generic-node-docs/getting-started/se-sw/).
+The [Generic Node documentation website](https://www.genericnode.com/docs/) provides information about the software features and how to [get started with the software development](https://www.genericnode.com/docs/getting-started/se-sw/).
 
 ## Legal
 

@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
-  * @file    mw_log_conf.h
+  * @file    sys_app.h
   * @author  MCD Application Team
-  * @brief   Configure (enable/disable) traces for CM0
-  *******************************************************************************
+  * @brief   Function prototypes for sys_app.c file
+  ******************************************************************************
   * @attention
   *
   * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
@@ -17,28 +17,29 @@
   ******************************************************************************
   */
 
-#ifndef __MW_LOG_CONF_H__
-#define __MW_LOG_CONF_H__
+#ifndef __SYS_APP_H__
+#define __SYS_APP_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "stm32_adv_trace.h"
+#include "stdint.h"
+#include "GNSE_tracer.h"
 
-#define MW_LOG_ENABLED
+/**
+  * @brief initialises the system (dbg pins, trace, systimer, LPM, ...)
+  * @param none
+  * @return  none
+  */
+void SystemApp_Init(void);
 
-#ifdef MW_LOG_ENABLED
-#define MW_LOG(TS,VL, ...)   do{ {UTIL_ADV_TRACE_COND_FSend(VL, T_REG_OFF, TS, __VA_ARGS__);} }while(0)
-#else  /* MW_LOG_ENABLED */
-#define VLEVEL_ABOVE_H   4    /* this level will be always filtered because too High */
-#define MW_LOG(TS,VL, ...)    do{ {UTIL_ADV_TRACE_COND_FSend(VLEVEL_ABOVE_H, T_REG_OFF, TS, __VA_ARGS__);} }while(0)
-#endif /* MW_LOG_ENABLED */
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /*__MW_LOG_CONF_H__ */
+#endif /* __SYS_APP_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

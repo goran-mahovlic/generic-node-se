@@ -132,6 +132,22 @@ typedef enum
 #define LOAD_SWITCH2_GPIO_CLK_ENABLE() __HAL_RCC_GPIOC_CLK_ENABLE()
 #define LOAD_SWITCH2_GPIO_CLK_DISABLE() __HAL_RCC_GPIOC_CLK_DISABLE()
 
+/*!
+ * Load Switch delay time defines in ms
+ * There are two load switches: one for the flash IC, the other for the sensors and secure element
+ * All values are rounded up (and increased) to ensure functionality.
+ * Delay values (Load Switch and sensor have to be added together for the full delay time)
+ * Load Switch:                 typ. 120-200 us
+ * Flash IC:                    min. 800 us
+ * Secure Element:              min. 100 us
+ * Temperature/Humidity sensor: max. 240 us
+ * Accelerometer:               tested to 5 ms, but could vary in different temperatures (datasheet does not define power on time)
+ */
+#define LOAD_SWITCH_SENSORS_DELAY_MS 10U
+#define LOAD_SWITCH_FLASH_DELAY_MS 5U
+#define LOAD_SWITCH1_DELAY_MS LOAD_SWITCH_SENSORS_DELAY_MS
+#define LOAD_SWITCH2_DELAY_MS LOAD_SWITCH_FLASH_DELAY_MS
+
 #define LOAD_SWITCHx_GPIO_CLK_ENABLE(__INDEX__) \
   do                                            \
   {                                             \
@@ -193,6 +209,7 @@ void GNSE_BSP_PB_Callback(Button_TypeDef Button);
 void GNSE_BSP_PB_IRQHandler(Button_TypeDef Button);
 
 int32_t GNSE_BSP_LS_Init(Load_Switch_TypeDef loadSwitch);
+int32_t GNSE_BSP_LS_DeInit(Load_Switch_TypeDef loadSwitch);
 int32_t GNSE_BSP_LS_SWITCH_DeInit(Load_Switch_TypeDef loadSwitch);
 int32_t GNSE_BSP_LS_On(Load_Switch_TypeDef loadSwitch);
 int32_t GNSE_BSP_LS_Off(Load_Switch_TypeDef loadSwitch);
@@ -208,6 +225,6 @@ int32_t GNSE_BSP_BM_ConfChannel(uint32_t channel);
 uint32_t GNSE_BSP_BM_ReadChannel();
 
 int32_t GNSE_BSP_Acc_Int_Init(void);
-int32_t GNSE_BSP_Acc_Int_Deinit(void);
+int32_t GNSE_BSP_Acc_Int_DeInit(void);
 
 #endif /* GNSE_BSP_GPIO_H */

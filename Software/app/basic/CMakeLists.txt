@@ -6,13 +6,17 @@ file(GLOB MAIN_SRC
     "${PROJECT_SOURCE_DIR}/target/*.c"
     "${PROJECT_SOURCE_DIR}/lib/GNSE_BSP/*.c"
     "${PROJECT_SOURCE_DIR}/lib/GNSE_HAL/*.c"
+    "${PROJECT_SOURCE_DIR}/lib/SPIFFS/*.c"
     "${PROJECT_SOURCE_DIR}/lib/Utilities/*.c"
     "${PROJECT_SOURCE_DIR}/lib/Utilities/baremetal/*.c"
+    "${PROJECT_SOURCE_DIR}/lib/GNSE_TRACER/adv_tracer/*.c"
+    "${PROJECT_SOURCE_DIR}/lib/GNSE_TRACER/tiny_printf/*.c"
     "${PROJECT_SOURCE_DIR}/lib/SHTC3/*.c"
     "${PROJECT_SOURCE_DIR}/lib/MX25R1635/*.c"
     "${PROJECT_SOURCE_DIR}/lib/LIS2DH12/*.c"
     "${PROJECT_SOURCE_DIR}/lib/BUZZER/*.c"
-    "${PROJECT_SOURCE_DIR}/lib/ATECC608A-TNGLORA/*.c"
+    "${PROJECT_SOURCE_DIR}/lib/ATECC608A-TNGLORA/atecc608a-tnglora-se-hal.c"
+    "${PROJECT_SOURCE_DIR}/lib/ATECC608A-TNGLORA/tnglora_read_helper.c"
     "${PROJECT_SOURCE_DIR}/lib/cryptoauthlib/lib/*.c"
     "${PROJECT_SOURCE_DIR}/lib/cryptoauthlib/lib/calib/*.c"
     "${PROJECT_SOURCE_DIR}/lib/cryptoauthlib/lib/crypto/*.c"
@@ -36,8 +40,12 @@ target_include_directories(${PROJECT_NAME}.elf
     ${PROJECT_SOURCE_DIR}/app/basic/conf
     ${PROJECT_SOURCE_DIR}/lib/GNSE_BSP
     ${PROJECT_SOURCE_DIR}/lib/GNSE_HAL
+    ${PROJECT_SOURCE_DIR}/lib/SPIFFS
     ${PROJECT_SOURCE_DIR}/lib/Utilities
     ${PROJECT_SOURCE_DIR}/lib/Utilities/baremetal
+    ${PROJECT_SOURCE_DIR}/lib/GNSE_TRACER
+    ${PROJECT_SOURCE_DIR}/lib/GNSE_TRACER/adv_tracer
+    ${PROJECT_SOURCE_DIR}/lib/GNSE_TRACER/tiny_printf
     ${PROJECT_SOURCE_DIR}/lib/SHTC3
     ${PROJECT_SOURCE_DIR}/lib/MX25R1635
     ${PROJECT_SOURCE_DIR}/lib/LIS2DH12

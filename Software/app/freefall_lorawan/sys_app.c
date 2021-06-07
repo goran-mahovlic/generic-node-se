@@ -29,6 +29,19 @@
 
 #define MAX_TS_SIZE (int)16
 
+#if defined(IWDG_TIMER_ON) && (IWDG_TIMER_ON == 1)
+/**
+  * @brief Timer to handle refreshing of the IWDG
+  */
+static UTIL_TIMER_Object_t iwdg_refresh_timer;
+
+/**
+ * @brief Handler for periodically refreshing the IWDG
+ */
+static void GNSE_On_IWDG_Event(void *context);
+#endif /* IWDG_TIMER_ON */
+
+
 /**
   * @brief  Set all pins such to minimized consumption (necessary for some STM32 families)
   * @param none
@@ -51,7 +64,7 @@ static void DBG_Init(void);
 static void TimestampNow(uint8_t *buff, uint16_t *size);
 
 /**
-  * @brief  it calls UTIL_ADV_TRACE_VSNPRINTF
+  * @brief  it calls ADV_TRACER_VSNPRINTF
   */
 static void tiny_snprintf_like(char *buf, uint32_t maxsize, const char *strFormat, ...);
 
@@ -73,34 +86,33 @@ void SystemApp_Init(void)
   /* Configure the debug mode*/
   DBG_Init();
 
-  /*Initialize the terminal */
-  UTIL_ADV_TRACE_Init();
-  UTIL_ADV_TRACE_RegisterTimeStampFunction(TimestampNow);
-
-  /*Set verbose LEVEL*/
-  UTIL_ADV_TRACE_SetVerboseLevel(VLEVEL_M);
+  /* Initialize Tracer/Logger */
+  GNSE_TRACER_INIT();
+  GNSE_TRACER_TIMESTAMP(TimestampNow);
 
   /* Set load switch */
   GNSE_BSP_LS_Init(LOAD_SWITCH_SENSORS);
   GNSE_BSP_LS_On(LOAD_SWITCH_SENSORS);
-  HAL_Delay(100);
+  HAL_Delay(LOAD_SWITCH_SENSORS_DELAY_MS);
 
   /* Set I2C interface */
   GNSE_BSP_Sensor_I2C1_Init();
-  HAL_Delay(100);
 
   /* Set accelerometer */
   if (GNSE_ACC_Init() != ACC_OP_SUCCESS)
   {
-    APP_LOG(TS_ON, VLEVEL_H, "\r\nAccelerometer failed to initialize properly \r\n");
+    APP_LOG(ADV_TRACER_TS_ON, ADV_TRACER_VLEVEL_H, "\r\nAccelerometer failed to initialize properly \r\n");
   }
   else
   {
-    APP_LOG(TS_ON, VLEVEL_H, "\r\nAccelerometer initialized \r\n");
+    APP_LOG(ADV_TRACER_TS_ON, ADV_TRACER_VLEVEL_H, "\r\nAccelerometer initialized \r\n");
   }
 
+  /* Set push button interrupt */
+  GNSE_BSP_PB_Init(BUTTON_SW1, BUTTON_MODE_EXTI);
   /* Set free fall events */
   ACC_FreeFall_Enable();
+  BUZZER_SetState(BUZZER_STATE_OFF);
 
   /* Here user can init the board peripherals and sensors */
 
@@ -115,7 +127,32 @@ void SystemApp_Init(void)
 #elif !defined(LOW_POWER_DISABLE)
 #error LOW_POWER_DISABLE not defined
 #endif /* LOW_POWER_DISABLE */
+
+  /* Set independent watchdog timer */
+#if defined(IWDG_TIMER_ON) && (IWDG_TIMER_ON == 1)
+  uint32_t iwdg_reload_value = IWDG_MAX_RELOAD;
+  /* 256 signifies the default prescaler set in GNSE_BSP_IWDG_Init, change if necessary */
+  uint32_t iwdg_seq_timeout_ms = (iwdg_reload_value / (LSI_VALUE / 256U) * 1000U);
+
+  GNSE_BSP_IWDG_Init(iwdg_reload_value);
+  /* Create timer to refresh the IWDG timer before it triggers */
+  UTIL_TIMER_Create(&iwdg_refresh_timer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, GNSE_On_IWDG_Event, NULL);
+  UTIL_TIMER_SetPeriod(&iwdg_refresh_timer, iwdg_seq_timeout_ms);
+  UTIL_TIMER_Start(&iwdg_refresh_timer);
+#endif /* IWDG_TIMER_ON */
 }
+
+#if defined(IWDG_TIMER_ON) && (IWDG_TIMER_ON == 1)
+/**
+  * @brief  On refreshing timer event, refreshes watchdog and reinitialised the timer for next refresh
+  * @return None
+  */
+static void GNSE_On_IWDG_Event(void *context)
+{
+  GNSE_BSP_IWDG_Refresh();
+  UTIL_TIMER_Start(&iwdg_refresh_timer);
+}
+#endif /* IWDG_TIMER_ON */
 
 /**
   * @brief redefines __weak function in stm32_seq.c such to enter low power
@@ -197,13 +234,13 @@ static void DBG_Init()
 }
 
 /* Disable StopMode when traces need to be printed */
-void UTIL_ADV_TRACE_PreSendHook(void)
+void ADV_TRACER_PreSendHook(void)
 {
   UTIL_LPM_SetStopMode((1 << CFG_LPM_UART_TX_Id), UTIL_LPM_DISABLE);
 }
 
 /* Re-enable StopMode when traces have been printed */
-void UTIL_ADV_TRACE_PostSendHook(void)
+void ADV_TRACER_PostSendHook(void)
 {
   UTIL_LPM_SetStopMode((1 << CFG_LPM_UART_TX_Id), UTIL_LPM_ENABLE);
 }
@@ -212,7 +249,7 @@ static void tiny_snprintf_like(char *buf, uint32_t maxsize, const char *strForma
 {
   va_list vaArgs;
   va_start(vaArgs, strFormat);
-  UTIL_ADV_TRACE_VSNPRINTF(buf, maxsize, strFormat, vaArgs);
+  ADV_TRACER_VSNPRINTF(buf, maxsize, strFormat, vaArgs);
   va_end(vaArgs);
 }
 
@@ -258,6 +295,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   if (GPIO_Pin == ACC_INT_PIN)
   {
     ACC_FreeFall_IT_Handler();
+  }
+  if (GPIO_Pin == BUTTON_SW1_PIN)
+  {
+    ACC_Disable_FreeFall_Notification();
   }
 }
 
