@@ -27,6 +27,7 @@
 #include "LmHandler.h"
 #include "lora_info.h"
 #include "AS7341.h"
+#include "GNSE_flash.h"
 
 // For time change
 // TYPE MINUTES
@@ -47,9 +48,16 @@
 
 uint8_t as7341_RX[40] = {'\0'};
 uint8_t firstStart = 1;
-volatile uint16_t minutes = 60;
-volatile uint8_t ledStatus = 0;
+uint8_t startup = 1;
+uint8_t downlinkData = 0;
+volatile static uint8_t atime = 29;
+volatile static uint16_t astep = 599;
+volatile static uint8_t again = 5;
+volatile static uint8_t wtime = 0x30;
+volatile static uint16_t minutes = 2;
+volatile static uint8_t ledStatus = 0;
 volatile uint8_t time_multiply = 6; // Needs to be 6 if we want to set time in minutes
+static uint8_t eeprom_data[20] = { '\0' };
 
 /**
   * @brief LoRa State Machine states
@@ -166,6 +174,18 @@ static UTIL_TIMER_Object_t TxTimer;
   */
 static UTIL_TIMER_Object_t TxLedTimer;
 
+static void save_eeprom_data(void){
+	  eeprom_data[0] = 0x01;
+	  eeprom_data[1] = minutes << 8;
+	  eeprom_data[2] = minutes;
+	  eeprom_data[3] = ledStatus;
+	  eeprom_data[4] = atime;
+	  eeprom_data[5] = astep << 8;
+	  eeprom_data[6] = astep;
+	  eeprom_data[7] = again;
+	  eeprom_data[8] = wtime;
+}
+
 void LoRaWAN_Init(void)
 {
   // User can add any indication here (LED manipulation or Buzzer)
@@ -183,6 +203,29 @@ void LoRaWAN_Init(void)
 
   LmHandlerJoin(ActivationType);
 
+  if(firstStart){
+	  firstStart = 0;
+		GNSE_Flash_Init();
+		GNSE_Flash_Read(0, 9, eeprom_data);
+		// Read first byte and check if device is used for first time
+		// If data on first byte in eeprom is not 0x05 - write defaults in EEPROM
+		if(eeprom_data[0] != 0x01){
+		  // Write to eeprom
+			save_eeprom_data();
+			GNSE_Flash_BlockErase(0,3);
+			GNSE_Flash_Write(0, 9, eeprom_data);
+		}
+		else{
+		  minutes = eeprom_data[1] << 8 | eeprom_data[2];
+		  ledStatus = eeprom_data[3];
+		  atime = eeprom_data[4];
+		  astep = eeprom_data[5] << 8 | eeprom_data[6];
+		  again = eeprom_data[7];
+		  wtime = eeprom_data[8];
+		}
+		GNSE_Flash_DeInit();
+  }
+
   if (EventType == TX_ON_TIMER)
   {
     /* send every time timer elapses */
@@ -194,6 +237,7 @@ void LoRaWAN_Init(void)
   {
     GNSE_BSP_PB_Init(BUTTON_SW1, BUTTON_MODE_EXTI);
   }
+
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
@@ -248,7 +292,7 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
       break;
     case LORAWAN_APP_PORT:
       APP_LOG(TS_OFF, VLEVEL_M, "\r\n Recieved %d bytes on LORAWAN_APP_PORT: %d \r\n", appData->BufferSize, LORAWAN_APP_PORT);
-
+      downlinkData = 1;
       switch(appData->Buffer[0]){
       	  case SET_TIME:
       	      minutes = appData->Buffer[1] << 8 | appData->Buffer[2];
@@ -268,17 +312,21 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
       		AS7341_writeRegister(appData->Buffer[1], appData->Buffer[2]);
     	  break;
       	  case SET_ATIME:
-      		AS7341_setATIME(appData->Buffer[1]);
+      		atime = appData->Buffer[1];
+      		AS7341_setATIME(atime);
     	  break;
       	  case SET_ASTEP:
-      		AS7341_setASTEP(appData->Buffer[1] << 8 | appData->Buffer[2]);
+      		astep = appData->Buffer[1] << 8 | appData->Buffer[2];
+      		AS7341_setASTEP(astep);
     	  break;
       	  case SET_GAIN:
       		if (appData->Buffer[1] > 10){ appData->Buffer[1] = 10;}
-      		AS7341_setGAIN(appData->Buffer[1]);
+      		again = appData->Buffer[1];
+      		AS7341_setGAIN(again);
     	  break;
       	  case SET_WTIME:
-      		AS7341_setWTIME(appData->Buffer[1]);
+      		wtime = appData->Buffer[1];
+      		AS7341_setWTIME(wtime);
     	  break;
       	  case GET_REGISTER:
     	  break;
@@ -302,7 +350,11 @@ static void SendTxData(void)
   UTIL_TIMER_Create(&TxLedTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTimerLedEvent, NULL);
   UTIL_TIMER_SetPeriod(&TxLedTimer, (APP_TX_DUTYCYCLE * time_multiply * minutes) - 5000);
   // Read only once here to set value in first message
-  if(firstStart){firstStart = 0;AS7341_read(as7341_RX, ledStatus);}
+  if(startup){
+	  startup = 0;
+	  AS7341_read(as7341_RX, ledStatus);
+  }
+
   // User can add any indication here (LED manipulation or Buzzer)
   uint8_t AS7341_size = 24;
   UTIL_TIMER_Start(&TxLedTimer);
@@ -337,6 +389,14 @@ static void OnTimerLedEvent(void *context)
 {
   // User can add any indication here (LED manipulation or Buzzer)
 	AS7341_read(as7341_RX, ledStatus);
+	if(downlinkData){
+		downlinkData = 0;
+		save_eeprom_data();
+		GNSE_Flash_Init();
+		GNSE_Flash_BlockErase(0,3);
+		GNSE_Flash_Write(0, 9, eeprom_data);
+		GNSE_Flash_DeInit();
+	}
 }
 
 static void OnTxData(LmHandlerTxParams_t *params)
