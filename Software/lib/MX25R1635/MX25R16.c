@@ -35,7 +35,7 @@ int MX25R16_Init(MxChip *Mxic)
 
     Mx_printf("\n\tStart initializing the device and controller\r\n");
 
-    memset(Mxic, 0, sizeof(MxChip));
+  //  memset(Mxic, 0, sizeof(MxChip));
 
     Status = MxSoftwareInit(Mxic, BASEADDRESS);
     if (Status != MXST_SUCCESS)
