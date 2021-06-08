@@ -70,7 +70,7 @@ extern "C" {
  * LoRaWAN Default data Rate Data Rate
  * @note Please note that LORAWAN_DEFAULT_DATA_RATE is used only when LORAWAN_ADR_STATE is disabled
  */
-#define LORAWAN_DEFAULT_DATA_RATE                   DR_0
+#define LORAWAN_DEFAULT_DATA_RATE                   DR_1
 
 /*!
  * User application data buffer size
