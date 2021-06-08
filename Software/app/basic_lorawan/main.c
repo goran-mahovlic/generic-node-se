@@ -97,7 +97,7 @@ int main(void)
   WWDG_Start();
   HAL_Init();
   SystemClock_Config();
-  //__HAL_RCC_WWDG_CLK_DISABLE();
+  __HAL_RCC_WWDG_CLK_DISABLE();
 
   MX_LoRaWAN_Init();
   //IWDG_Start();

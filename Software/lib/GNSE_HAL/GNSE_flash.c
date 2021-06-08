@@ -138,7 +138,8 @@ FLASH_op_result_t GNSE_Flash_BlockErase(uint32_t addr, uint32_t block_count)
   FLASH_op_result_t status = FLASH_OP_SUCCESS;
   if (MxIsFlashBusy(&GNSE_Flash) == MXST_DEVICE_READY)
   {
-    if (GNSE_Flash.AppGrp._Erase(&GNSE_Flash, addr, block_count) != MXST_SUCCESS)
+    //if (GNSE_Flash.AppGrp._Erase(&GNSE_Flash, addr, block_count) != MXST_SUCCESS)
+    if (MxSE(&GNSE_Flash,addr,block_count) != MXST_SUCCESS)
     {
       status = FLASH_OP_FAIL;
     }
