@@ -176,11 +176,11 @@ static UTIL_TIMER_Object_t TxLedTimer;
 
 static void save_eeprom_data(void){
 	  eeprom_data[0] = 0x01;
-	  eeprom_data[1] = minutes << 8;
+	  eeprom_data[1] = minutes >> 8;
 	  eeprom_data[2] = minutes;
 	  eeprom_data[3] = ledStatus;
 	  eeprom_data[4] = atime;
-	  eeprom_data[5] = astep << 8;
+	  eeprom_data[5] = astep >> 8;
 	  eeprom_data[6] = astep;
 	  eeprom_data[7] = again;
 	  eeprom_data[8] = wtime;
