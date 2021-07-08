@@ -35,6 +35,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 enable_language(C ASM)
 project(main)
 set (APP_LIST
+"app_template"
 "basic"
 "basic_lorawan"
 "basic_bootloader"
@@ -42,7 +43,9 @@ set (APP_LIST
 "freefall_lorawan"
 "freertos_lorawan"
 "secure_element_lorawan"
-"basic_azurertos")
+"basic_azurertos"
+"sensors_lorawan"
+"basic_fuota")
 #-------------------
 # MCU Setup
 #-------------------
