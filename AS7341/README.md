@@ -46,6 +46,10 @@ Message|Description
 0x06 0x05 | Set gain to 5 (maximum is 10)
 0x07 | Reset node
 
+#### TTN time set downlink
+
+![set-time (set-time)](Downlink.png)
+
 ### Node Encoder
 
 ![node-red (node-red)](node.png)
@@ -77,16 +81,10 @@ SET_STEP range is from 0 to 65534
 
 SET_REGISTER - it is left for debugging purpose - with this we can set directly any register of AS7341
 
-### Known bugs
+### Known bugs - todo
 
-On first version of code SET_TIME and SET_ASTEP bytes are switched
-
-Node can reset from time to time - if that happens it has detected I2C HAL error and stayed in higher consuption.
-
-After reset node will rejoin and stay in low consumption
-
-Settings (send time, astep, atime) are not saved into eeprom - so after each reset node will have default settings.
-
-On test node with harvester board I coul not use SF12 that is in default code, after switching to SF10 wverything works.
-
-On test node send interval is set on 60 minutes
+[x] SET_TIME and SET_ASTEP bytes are switched
+[] Node can reset from time to time - if that happens it has detected I2C HAL error and stayed in higher consuption, after reset node will rejoin and stay in low consumption
+[x] Settings (send time, astep, atime) are not saved into eeprom - so after each reset node will have default settings.
+[] On test node with harvester board I coul not use SF12 that is in default code, after switching to SF10 wverything works.
+[] Default send interval is set to 15 minutes - first data message will arive in 15 minutes from startup
