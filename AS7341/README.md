@@ -83,8 +83,8 @@ SET_REGISTER - it is left for debugging purpose - with this we can set directly 
 
 ### Known bugs - todo
 
-[x] SET_TIME and SET_ASTEP bytes are switched
-[] Node can reset from time to time - if that happens it has detected I2C HAL error and stayed in higher consuption, after reset node will rejoin and stay in low consumption
-[x] Settings (send time, astep, atime) are not saved into eeprom - so after each reset node will have default settings.
-[] On test node with harvester board I coul not use SF12 that is in default code, after switching to SF10 wverything works.
-[] Default send interval is set to 15 minutes - first data message will arive in 15 minutes from startup
+- [x] SET_TIME and SET_ASTEP bytes are switched
+- [x] Settings (send time, astep, atime) are not saved into eeprom - so after each reset node will have default settings.
+- [ ] Node can reset from time to time - if that happens it has detected I2C HAL error and stayed in higher consuption, after reset node will rejoin and stay in low consumption
+- [ ] On test node with harvester board I coul not use SF12 that is in default code, after switching to SF10 wverything works.
+- [ ] Default send interval is set to 15 minutes - first data message will arive in 15 minutes from startup
